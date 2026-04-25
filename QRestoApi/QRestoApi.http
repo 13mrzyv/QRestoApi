@@ -1,0 +1,6 @@
+@QRestoApi_HostAddress = http://localhost:5184
+
+GET {{QRestoApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
