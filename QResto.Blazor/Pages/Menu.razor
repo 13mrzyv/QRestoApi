@@ -1,0 +1,465 @@
+﻿@page "/"
+@page "/menu"
+@using QResto.Blazor.Services
+@using QResto.Shared.DTOs.Responses
+
+@inject BasketService BasketService
+@inject MenuService MenuService
+@implements IDisposable
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4 fw-bold">Restoran Menyumuz</h2>
+
+    @if (MenuService.CachedProducts == null)
+    {
+        //loading ekranı
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Ləzzətli yeməklər hazırlanır...</p>
+        </div>
+    }
+    else
+    {
+        <div class="category-scroll-container mb-4">
+            <div class="d-flex flex-nowrap gap-2 px-3">
+                <button class="btn btn-category @(selectedCategory == "Hamısı" ? "active" : "")"
+                        @onclick='() => FilterByCategory("Hamısı")'>
+                    Hamısı
+                </button>
+
+                @foreach (var category in categoryList)
+                {
+                    <button class="btn btn-category @(selectedCategory == category ? "active" : "")"
+                            @onclick='() => FilterByCategory(category)'>
+                        @category
+                    </button>
+                }
+            </div>
+        </div>
+
+        <style>
+            /* Konteynerin kənara çıxan hissələrini gizlədir və sürüşməni aktiv edir */
+            .category-scroll-container {
+                overflow-x: auto;
+                white-space: nowrap;
+                scrollbar-width: none; /* Firefox üçün scrollbar-ı gizlədir */
+                -ms-overflow-style: none; /* IE üçün scrollbar-ı gizlədir */
+                -webkit-overflow-scrolling: touch; /* Mobildə daha axıcı sürüşmə */
+            }
+
+                /* Chrome, Safari və Opera üçün scrollbar-ı gizlədir */
+                .category-scroll-container::-webkit-scrollbar {
+                    display: none;
+                }
+
+            .btn-category {
+                border-radius: 20px;
+                padding: 8px 20px;
+                border: 1px solid #0d6efd;
+                color: #0d6efd;
+                background-color: transparent;
+                white-space: nowrap; /* Yazının aşağı sətirə keçməsini önləyir */
+                font-weight: 500;
+                transition: 0.3s;
+            }
+
+                .btn-category.active {
+                    background-color: #0d6efd;
+                    color: white;
+                }
+
+                .btn-category:hover {
+                    background-color: #f0f7ff;
+                }
+        </style>
+
+        <div class="row g-3">
+            @foreach (var item in filteredProducts)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    @* 'product-out' klassı və opacity IsAvailable false olduqda aktivləşir *@
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden"
+                         style="@(item.IsAvailable ? "" : "opacity: 0.6; filter: grayscale(1);")"
+                         @onclick="() => OpenProductDetail(item)">
+
+                        <div class="position-relative">
+                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name"
+                                 style="height: 160px; object-fit: cover;">
+
+                            @* Məhsul yoxdursa üzərinə kiçik etiket qoyuruq *@
+                            @if (!item.IsAvailable)
+                            {
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-dark opacity-75 small">Tükənib</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="card-body p-2 p-md-3 d-flex flex-column">
+                            <h6 class="card-title fw-bold mb-1">@item.Name</h6>
+                            <p class="card-text text-muted small flex-grow-1" style="font-size: 0.8rem;">
+                                @item.Description
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="text-primary fw-bold">@item.Price AZN</span>
+
+                                @* Düymənin 'disabled' xüsusiyyəti məntiqə bağlanır *@
+                                <button class="btn btn-sm btn-success rounded-circle shadow-sm"
+                                        @onclick="() => HandleQuickAdd(item)"
+                                        @onclick:stopPropagation="true"
+                                        disabled="@(!item.IsAvailable)"
+                                        style="width: 32px; height: 32px; padding: 0;">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        //sebet duymeleri
+        <div class="fixed-bottom p-3 d-flex flex-column align-items-center" style="gap: 10px;">
+
+            @* QIRMIZI DÜYMƏ: Artıq verilmiş sifarişlər (Masa Hesabı) *@
+            @if (BasketService.OrderedItems != null && BasketService.OrderedItems.Count > 0)
+            {
+                <div>
+                    <button class="btn btn-danger shadow-lg rounded-pill px-4 py-2"
+                            @onclick="ToggleOrderedModal" //@onclick:stopPropagation ="true" @onmousedown:stopPropagation="true"
+                            style="min-width: 150px; pointer-events: auto; border: 2px solid white; z-index: 1060;">
+                        <i class="bi bi-receipt me-2"></i>
+                        Sifarişlərim (@BasketService.GetOrderedTotal().ToString("0.00") AZN)
+                    </button>
+                </div>
+            }
+
+            @* 2. YAŞIL DÜYMƏ: "Səbətim" (Yalnız + düyməsinə basanda çıxır) *@
+            @if (BasketService.Items.Count > 0)
+            {
+                <button class="btn btn-success shadow-lg rounded-pill px-4 py-2"
+                        @onclick="OpenBasket"
+                        style="min-width: 150px; z-index: 1050; border: 2px solid white;">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <span><i class="bi bi-cart3 me-2"></i> Səbətim</span>
+                        @* <span class="badge bg-white text-success rounded-pill ms-2">@BasketService.GetBasketTotal()</span> *@
+                        <span class="fw-bold ms-3">@BasketService.GetBasketTotal() AZN</span>
+                    </div>
+                </button>
+            }
+        </div>
+        }
+        @if (isOrderedModalOpen)
+        {
+        <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Masa Sifarişləriniz</h5>
+                        <button type="button" class="btn-close btn-close-white" @onclick="() => isOrderedModalOpen = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in BasketService.OrderedItems)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">@item.ProductName</h6>
+                                        <small class="text-muted">@item.UnitPrice AZN x @item.Quantity</small>
+                                    </div>
+                                    <span class="fw-bold">@(item.UnitPrice* item.Quantity) AZN</span>
+                                </li>
+                            }
+                        </ul>
+                        <hr />
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Cəmi Hesab:</span>
+                            <span>@BasketService.GetOrderedTotal() AZN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        @if (isBasketOpen)
+        {
+            <div class="modal fade show d-block" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                        <div class="modal-header bg-light">
+                            <h5 class="modal-title fw-bold">@(orderSuccess ? "Uğurlu!" : "Sifarişiniz")</h5>
+                            @if (!isOrdering && !orderSuccess)
+                            {
+                                <button type="button" class="btn-close" @onclick="CloseBasket"></button>
+                            }
+                        </div>
+                        <div class="modal-body text-center" style="max-height: 450px; overflow-y: auto;">
+                            @if (isOrdering)
+                            {
+                                <div class="py-5">
+                                    <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status"></div>
+                                    <h5 class="mt-3 fw-bold">Sifariş göndərilir...</h5>
+                                    <p class="text-muted">Zəhmət olmasa gözləyin.</p>
+                                </div>
+                            }
+                        else if (orderSuccess)
+                        {
+                            <div class="py-5 px-4 animate__animated animate__fadeIn">
+                                @* Peşəkar Təsdiq İkonu Animasiyası *@
+                                <div class="success-checkmark mb-4">
+                                    <div class="check-icon">
+                                        <span class="icon-line line-tip"></span>
+                                        <span class="icon-line line-long"></span>
+                                        <div class="icon-circle"></div>
+                                        <div class="icon-fix"></div>
+                                    </div>
+                                </div>
+
+                                <h3 class="fw-bold text-dark mt-4 animate__animated animate__fadeInUp animate__delay-1s">
+                                    Sifarişiniz Alındı!
+                                </h3>
+                                <p class="text-muted fs-6 animate__animated animate__fadeInUp animate__delay-1s">
+                                    Təşəkkür edirik. Sifarişiniz hazırda hazırlanır və qısa müddətdə masanıza servis ediləcək.
+                                </p>
+
+                                @* Progress Bar - Daha incə və zərif *@
+                                <div class="mt-5 px-5">
+                                    <div class="progress rounded-pill" style="height: 4px; background-color: #e9ecef;">
+                                        <div class="progress-bar bg-success rounded-pill"
+                                             style="width: 100%; transition: width 3s linear; animation: progressLoad 3s linear;">
+                                        </div>
+                                    </div>
+                                    <small class="text-uppercase ls-wide mt-2 d-block text-secondary fw-semibold" style="font-size: 0.7rem; letter-spacing: 1px;">
+                                        Mətbəxə yönləndirilir
+                                    </small>
+                                </div>
+                            </div>
+                        }
+                            else
+                            {
+                                @if (!BasketService.Items.Any())
+                                {
+                                    <p class="py-4 text-muted">Səbətiniz boşdur.</p>
+                                }
+                                else
+                                {
+                                @foreach (var item in BasketService.Items)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                        <div class="text-start d-flex align-items-center">
+                                            <button class="btn btn-sm btn-danger rounded-circle me-2 shadow-sm"
+                                                    @onclick="() => BasketService.RemoveFromBasket(item.ProductId)"
+                                                    style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border: none;"
+                                                    title="Sil">
+                                                <span style="font-weight: bold; font-size: 14px; line-height: 1; margin-top: -1px;">&times;</span>
+                                            </button>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">@item.ProductName</h6>
+                                                <small class="text-muted">Qiymət: @item.UnitPrice AZN</small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-secondary rounded-pill me-3">@item.Quantity ədəd</span>
+                                            <span class="fw-bold">@(item.UnitPrice* item.Quantity) AZN</span>
+                                        </div>
+                                    </div>
+                                }
+                                    <div class="d-flex justify-content-between mt-3 px-2">
+                                        <span class="h5">Cəmi:</span>
+                                        <span class="h5 fw-bold text-primary">@BasketService.GetOrderedTotal() AZN</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        @if (!isOrdering && !orderSuccess && BasketService.Items.Any())
+                        {
+                            <div class="modal-footer border-0 p-3">
+                                <button class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow"
+                                        @onclick="ConfirmOrder">
+                                    TƏSDİQLƏ 🚀
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @if (SelectedProduct != null)
+        {
+         <!-- Modalın arxa fonu -->
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">@SelectedProduct.Name</h5>
+                        <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    </div>
+
+                    <div class="modal-body text-center p-4">
+                        <!-- Məhsulun şəkli -->
+                        <img src="@SelectedProduct.ImageUrl" class="img-fluid rounded-4 mb-3 shadow-sm"
+                             style="max-height: 250px; width: 100%; object-fit: cover;">
+
+                        <!-- Description (Tərkibi) -->
+                        <div class="text-start mt-3">
+                            <h6 class="fw-bold text-success"><i class="bi bi-info-circle me-2"></i>Məhsul haqqında:</h6>
+                            <p class="text-muted" style="line-height: 1.6;">
+                                @(string.IsNullOrEmpty(SelectedProduct.Description)
+                                                            ? "Bu məhsul üçün təsvir əlavə edilməyib."
+                                                            : SelectedProduct.Description)
+                        </p>
+                    </div>
+                </div>
+
+                    <div class="modal-footer border-0 p-3">
+                        <button class="btn btn-light rounded-pill px-4" @onclick="CloseModal">Bağla</button>
+                        @if (SelectedProduct.IsAvailable)
+                        {
+                            <!-- Stokda varsa: Yaşıl düymə və klik funksiyası -->
+                            <button class="btn btn-success rounded-pill px-4 shadow"
+                                    @onclick="() => { BasketService.AddToBasket(SelectedProduct); CloseModal(); }">
+                                Səbətə əlavə et - @SelectedProduct.Price AZN
+                            </button>
+                        }
+                        else
+                        {
+                            <!-- Stokda yoxdursa: Boz düymə və klik işləmir (disabled) -->
+                            <button class="btn btn-secondary rounded-pill px-4 shadow" disabled style="cursor: not-allowed;">
+                                Stokda yoxdur
+                            </button>
+                        }
+                        @* <button class="btn btn-success rounded-pill px-4 shadow" @onclick="() => { BasketService.AddToBasket(SelectedProduct); CloseModal(); }">
+                            Səbətə əlavə et - @SelectedProduct.Price AZN
+                        </button> *@
+                    </div>
+
+                </div>
+            </div>
+        </div> 
+        }
+            
+</div>
+
+@code {
+    private bool isOrderedModalOpen = false;
+    private List<ProductResponse> filteredProducts;
+    private List<string> categoryList = new();
+    private string selectedCategory = "Hamısı";
+    bool isBasketOpen = false;
+    bool isOrdering = false;
+    bool orderSuccess = false;
+    //Hazrki masa
+    int currentTableId = 3;
+
+    void OpenBasket() => isBasketOpen = true;
+    void CloseBasket() => isBasketOpen = false;
+
+    private void ToggleOrderedModal() => isOrderedModalOpen = !isOrderedModalOpen;
+
+    private ProductResponse? SelectedProduct; // Seçilmiş məhsulu yadda saxlamaq üçün
+    private bool _isButtonClicked = false;
+
+    private async Task HandleQuickAdd(ProductResponse productResponse)
+    {
+        _isButtonClicked = true; // Düyməyə basıldığını qeyd edirik
+        BasketService.AddToBasket(productResponse);
+
+        // Qısa müddət sonra bayrağı endiririk ki, növbəti kliklər işləsin
+        await Task.Delay(100);
+        _isButtonClicked = false;
+    }
+
+    private void OpenProductDetail(ProductResponse productResponse)
+    {
+        // Əgər düyməyə basılıbsa, modal açılmasın
+        if (_isButtonClicked) return;
+        SelectedProduct = productResponse; // Hansı məhsula basılıbsa onu mənimsədirik
+    }
+
+    private void CloseModal()
+    {
+        SelectedProduct = null; // Modalı bağlamaq üçün seçimi sıfırlayırıq
+    }
+
+    // Tək OnInitializedAsync kifayətdir, hər iki işi burada görürük
+    protected override async Task OnInitializedAsync()
+    {
+        // Eventə abunə oluruq
+        BasketService.OnChange += StateHasChanged;
+
+        await BasketService.LoadActiveOrder(currentTableId);
+
+        var allProducts = await MenuService.GetMenuAsync();
+        if (allProducts != null)
+        {
+            categoryList = allProducts
+                .Select(p => p.CategoryName)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+
+            FilterByCategory(selectedCategory);
+        }
+    }
+
+    public void Dispose()
+    {
+        BasketService.OnChange -= StateHasChanged;
+    }
+
+    async Task ConfirmOrder()
+    {
+        isOrdering = true;
+        orderSuccess = false;
+        StateHasChanged();
+
+        var success = await BasketService.SendOrderToBackend(currentTableId);
+
+        isOrdering = false;
+
+        if (success)
+        {
+            orderSuccess = true;
+            StateHasChanged();
+            await Task.Delay(6000);
+            isBasketOpen = false;
+            orderSuccess = false;
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("Sifariş göndərilərkən xəta baş verdi.");
+        }
+    }
+
+    async Task CompletePayment()
+    {
+        int tableId = 3;
+        var success = await MenuService.CloseTableAccount(tableId);
+
+        if (success)
+        {
+            BasketService.Items.Clear();
+            BasketService.OrderedItems.Clear();
+            isBasketOpen = false;
+            isOrderedModalOpen = false;
+
+            orderSuccess = true;
+            StateHasChanged();
+
+            await Task.Delay(2000);
+            orderSuccess = false;
+            StateHasChanged();
+        }
+    }
+    private void FilterByCategory(string categoryName)
+    {
+        selectedCategory = categoryName;
+        var allProducts = MenuService.CachedProducts;
+        if (allProducts == null) return;
+
+        filteredProducts = (categoryName == "Hamısı")
+            ? allProducts
+            : allProducts.Where(p => p.CategoryName == categoryName).ToList();
+    }
+}

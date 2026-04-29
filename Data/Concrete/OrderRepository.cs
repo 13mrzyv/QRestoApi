@@ -39,12 +39,17 @@ namespace Data.Concrete
         }
         public async Task<IEnumerable<dynamic>> GetOrderItemsByOrderIdAsync(int id)
         {
-            var sql = @"SELECT p.Name, oi.Quantity, oi.UnitPrice
+            var sql = @"SELECT  p.Id AS ProductId, p.Name, oi.Quantity, oi.UnitPrice
                 FROM OrderItems oi
                 JOIN Products p ON oi.ProductId = p.Id
                 WHERE oi.OrderId = @OrderId";
 
             return await _connection.QueryAsync(sql, new { OrderId = id }, _transaction);
+        }
+        public async Task<Order> GetActiveOrderByTableIdAsync(int tableId)
+        {
+            var sql = "SELECT * FROM Orders WHERE TableId = @TableId AND Status = 1";
+            return await _connection.QuerySingleOrDefaultAsync<Order>(sql, new { TableId = tableId }, _transaction);
         }
         public async Task UpdateOrderStatusAsync(int orderId, int newStatus)
         {
@@ -53,11 +58,7 @@ namespace Data.Concrete
 
         }
         // isletmedim belke
-        public async Task<Order?> GetActiveOrderByTableIdAsync(int tableId)
-        {
-            var sql = "SELECT * FROM Orders WHERE TableId = @TableId AND Status = 1";
-            return await _connection.QuerySingleOrDefaultAsync<Order>(sql, new { TableId = tableId }, _transaction);
-        }
+
         public async Task UpdateTotalAmountByIdAsync(int orderId, decimal newTotalAmount)
         {
             var sql = "UPDATE Orders SET TotalAmount = @TotalAmount WHERE Id = @Id";

@@ -70,7 +70,7 @@ namespace Business.Concrete
 
                 int TableStatus = await _unitOfWork.TablesRepository.GetTableStatusAsync(request.TableId);
 
-                if ( TableStatus == 0)
+                if (TableStatus == 0)
                 {
                     int newOrderId = await _unitOfWork.OrdersRepository.InsertOrderAsync(order);
                     orderItems.ForEach(x => x.OrderId = newOrderId);
@@ -95,12 +95,12 @@ namespace Business.Concrete
             }
         }
 
-        public async Task<OrderDetailResponse> GetOrderDetailsAsync(int id)
+        public async Task<OrderDetailResponse> GetOrderDetailsAsync(int tableId)
         {
-            var order = await _unitOfWork.OrdersRepository.GetOrderByIdAsync(id);
+            var order = await _unitOfWork.OrdersRepository.GetActiveOrderByTableIdAsync(tableId);
             if (order == null)
                 return null;
-            var items = await _unitOfWork.OrdersRepository.GetOrderItemsByOrderIdAsync(id);
+            var items = await _unitOfWork.OrdersRepository.GetOrderItemsByOrderIdAsync(order.Id);
             return new OrderDetailResponse
             {
                 OrderId = order.Id,
@@ -108,25 +108,26 @@ namespace Business.Concrete
                 TotalAmount = order.TotalAmount,
                 Items = items.Select(i => new OrderItemResponse
                 {
+                    ProductId = i.ProductId,
                     ProductName = i.Name,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice
                 }).ToList()
             };
         }
-        public async Task CheckoutAsync(CheckoutRequest request)
+        public async Task CheckoutAsync(int tableId)
         {
             _unitOfWork.BeginTransaction();
             try
             {
-                var activeOrder = await _unitOfWork.OrdersRepository.GetActiveOrderByTableIdAsync(request.TableId);
+                var activeOrder = await _unitOfWork.OrdersRepository.GetActiveOrderByTableIdAsync(tableId);
 
                 if (activeOrder == null)
                     throw new Exception("Bu masada aktiv sifariş tapılmadı!");
                 // 1. Sifarişi "ÖDƏNİB" ET (Status = 2)
                 await _unitOfWork.OrdersRepository.UpdateOrderStatusAsync(activeOrder.Id, 2);
                 // 2. MASANI "BOŞ" ET (Bax bura önəmlidir!)
-                await _unitOfWork.TablesRepository.UpdateTableStatusAsync(request.TableId, 0);
+                await _unitOfWork.TablesRepository.UpdateTableStatusAsync(tableId, 0);
                 _unitOfWork.Commit();
             }
             catch (Exception)
@@ -134,6 +135,11 @@ namespace Business.Concrete
                 _unitOfWork.Rollback();
                 throw; // Xətanı yuxarı (Controller-ə) ötür ki, istifadəçi bilsin
             }
+        }
+        public async Task<Order> GetActiveOrderIdByTableIdAsync(int tableId)
+        {
+            var activeOrder = await _unitOfWork.OrdersRepository.GetActiveOrderByTableIdAsync(tableId);
+            return activeOrder;
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Business.Abstract;
+﻿using AutoMapper;
+using Business.Abstract;
 using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Data.Abstract;
 using Entity;
 using System;
@@ -13,14 +15,21 @@ namespace Business.Concrete
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ProductService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
             return await _unitOfWork.ProductsRepository.GetAllProductsAsync();
+        }
+        public async Task<IEnumerable<ProductResponse>> GetAllProductsForCustomerAsync()
+        {   
+            var products = await _unitOfWork.ProductsRepository.GetAllProductsAsync();
+            return _mapper.Map<IEnumerable<ProductResponse>>(products);
         }
 
         public async Task<Product> GetProductByIdAsync(int id)
@@ -32,6 +41,25 @@ namespace Business.Concrete
         {
             return await _unitOfWork.ProductsRepository.GetProductsByCategoryIdAsync(categoryId);
         }
+
+        public async Task<List<ProductResponse>> GetFullMenuAsync()
+        {
+            var allProducts = await _unitOfWork.ProductsRepository.GetAllProductsAsync();
+            var allCategories = await _unitOfWork.CategoriesRepository.GetAllCategoriesAsync();
+
+            // 2. AutoMapper ilə əsas hissələri map edirik
+            var response = _mapper.Map<List<ProductResponse>>(allProducts);
+
+            // 3. İndi isə CategoryName hissəsini "yamayırıq"
+            foreach (var item in response)
+            {
+                // Hər məhsulun öz CategoryId-sinə uyğun adı tapırıq
+                item.CategoryName = allCategories.FirstOrDefault(c => c.Id == item.CategoryId)?.Name;
+            }
+
+            return response;
+        }
+
 
         public async Task<bool> InsertProductAsync(InsertProductRequest insertProductRequest)
         {

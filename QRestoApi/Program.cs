@@ -1,12 +1,17 @@
 ﻿using Business.Abstract;
 using Business.Concrete;
+using Business.Mapper;
+using Business.Validators.Requests;
 using Data;
 using Data.Abstract;
 using Data.Concrete;
 using Entity;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QRestoApi.Middlewares;
@@ -18,6 +23,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderRequestValidator>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
@@ -60,7 +69,11 @@ builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IReportsService, ReportsService>();
 
-// 1. DbContext qeydiyyatı (SQL Server istifadə ediriksə)
+
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -100,7 +113,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
+// 1. CORS-u əlavə et
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -118,6 +140,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseCors("AllowAll");
 
 app.MapControllers();
 

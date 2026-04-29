@@ -22,6 +22,12 @@ namespace QRestoApi.Controllers
             return Ok(products);
         }
         [HttpGet]
+        public async Task<IActionResult> GetAllProductsForCustomer()
+        {
+            var products = await _productService.GetAllProductsForCustomerAsync();
+            return Ok(products);
+        }
+        [HttpGet]
         public async Task<IActionResult> GetProductById(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
@@ -35,6 +41,13 @@ namespace QRestoApi.Controllers
         public async Task<IActionResult> GetProductsByCategoryId(int categoryId)
         {
             var products = await _productService.GetProductsByCategoryIdAsync(categoryId);
+            return Ok(products);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFullMenu()
+        {
+            var products = await _productService.GetFullMenuAsync();
             return Ok(products);
         }
         [HttpPost]
@@ -63,5 +76,7 @@ namespace QRestoApi.Controllers
             }
             return NoContent();
         }
+
+
     }
 }
