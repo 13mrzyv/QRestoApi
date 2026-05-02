@@ -19,8 +19,16 @@ namespace Data.Concrete
         public async Task<IEnumerable<Table>> GetAllTablesAsync()
         {
             var sql = "SELECT * FROM Tables";
-            return await _connection.QueryAsync<Table>(sql, transaction: _transaction);
 
+            return await _connection.QueryAsync<Table>(sql, transaction: _transaction);
+        }
+        public async Task<IEnumerable<dynamic>> GetAllTablesDynamicAsync()
+        {
+            // View-dan hər şeyi çəkirik
+            var sql = "SELECT * FROM View_TableStatus";
+
+            // Tip təyin etmirik, Dapper avtomatik dynamic obyektlər yaradır
+            return await _connection.QueryAsync(sql, transaction: _transaction);
         }
         public async Task InsertTableAsync(Table table)
         {

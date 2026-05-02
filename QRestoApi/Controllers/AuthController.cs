@@ -1,4 +1,5 @@
-﻿using Business.DTOs;
+﻿using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ namespace QRestoApi.Controllers
             _configuration = configuration;
         }
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto registerDto)
+        public async Task<IActionResult> Register(RegisterRequest registerDto)
         {
             var user = new AppUser
             {
@@ -48,7 +49,7 @@ namespace QRestoApi.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<IActionResult> Login(LoginRequest loginDto)
         {
             // 1. Nickname-ə görə istifadəçini tap
             var user = await _userManager.FindByNameAsync(loginDto.Username);
@@ -56,13 +57,17 @@ namespace QRestoApi.Controllers
             // 2. Şifrəni yoxla
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
+                var roles = await _userManager.GetRolesAsync(user);
+                var userRole = roles.FirstOrDefault();
                 // 3. Hər şey OK-dirsə, vəsiqəsini (token) hazırla
                 var token = await GenerateJwtToken(user);
 
-                return Ok(new
+                return Ok(new LoginResponse
                 {
-                    token = token,
-                    message = "Giriş uğurludur!"
+                    Token = token,
+                    Message = "Giriş uğurludur!",
+                    Role = userRole,
+                    Username = user.UserName
                 });
             }
 

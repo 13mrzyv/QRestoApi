@@ -1,5 +1,6 @@
 ﻿using Business.Abstract;
 using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Data.Abstract;
 using Data.Concrete;
 using Entity;
@@ -22,7 +23,21 @@ namespace Business.Concrete
 
         public async Task<IEnumerable<Table>> GetAllTablesAsync()
         {
-            return await _unitOfWork.TablesRepository.GetAllTablesAsync();
+            var response = await _unitOfWork.TablesRepository.GetAllTablesAsync();
+
+            return response.ToList();
+        }
+        public async Task<IEnumerable<TableResponse>> GetAllTableResponsesAsync()
+        {
+            var response = await _unitOfWork.TablesRepository.GetAllTablesDynamicAsync();
+
+            return response.Select(t => new TableResponse
+            {
+                Id = t.Id,
+                TableNumber = t.TableNumber,
+                Status = t.Status,
+                TotalAmount = t.TotalAmount
+            }).ToList();
         }
         public async Task CreateTableAsync(InsertTableRequest insertTableRequest)
         {

@@ -1,0 +1,150 @@
+@* @page "/" *@
+@page "/waiter/waiterdashboard"
+@using QResto.Shared.DTOs.Responses
+@layout QResto.Blazor.Layouts.WaiterLayout
+@inject HttpClient Http
+@inject IJSRuntime JsRuntime
+@inject NavigationManager Navigation
+
+<div class="main-wrapper">
+    <div class="content-area">
+        <h3 class="page-title">Zalın Vəziyyəti</h3>
+
+        @if (tables == null)
+        {
+            <div class="loader-container">
+                <div class="loader"></div>
+                <p>Məlumatlar yüklənir...</p>
+            </div>
+        }
+        else
+        {
+            <div class="tables-grid">
+                @foreach (var table in tables)
+                {
+                    <div class="table-card @(table.Status == 0 ? "free" : "busy")">
+                        <!-- Masa məlumatı -->
+                        @* <div class="table-info">
+                            <span class="table-number">@table.TableNumber</span>
+                            <span class="table-status">@(table.Status == 0 ? "Boş" : "Dolu")</span>
+                        </div>  *@
+                        <div class="table-info">
+                            <span class="table-number">@table.TableNumber</span>
+
+                            @if (table.Status != 0)
+                            {
+                                <div class="table-stats">
+                                    <div class="stat-item">
+                                        <i class="bi bi-cash-stack"></i>
+                                        <span>@table.TotalAmount.ToString("0.00") AZN</span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="table-status">Boş</span>
+                            }
+                        </div>
+
+
+                        <!-- İdarəetmə İkonları -->
+                        <div class="table-actions">
+                            <!-- Sifarişə baxış və ya əlavə etmək üçün ikon -->
+                            <button class="action-btn view-btn" title="Sifarişlər" @onclick="() => GoToOrder(table)">
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                            <!-- Masa doludursa, deaktiv etmək (boşaltmaq) ikonu -->
+                            @if (table.Status != 0)
+                            {
+                                <button class="action-btn deactivate-btn" title="Masanı boşalt" @onclick="() => ClearTable(table)">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            // masa baglama Modal təsviri
+            @if (showConfirmModal)
+            {
+                <div class="modal-backdrop">
+                    <div class="confirm-modal animate__animated animate__zoomIn">
+                        <div class="modal-icon">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <h4>Hesab Bağlansın?</h4>
+                        <p>Masa <strong>@tableToProcess?.TableNumber</strong> üçün bütün sifarişlər tamamlanacaq.</p>
+                        <div class="modal-buttons">
+                            <button class="btn-cancel" @onclick="CloseModal">Ləğv et</button>
+                            <button class="btn-confirm" @onclick="ConfirmClearTable">Bəli, Boşalt</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private List<TableResponse> tables;
+    private bool showConfirmModal = false;
+    private TableResponse tableToProcess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTables();
+    }
+    private void ClearTable(TableResponse table)
+    {
+        tableToProcess = table;
+        showConfirmModal = true;
+    }
+
+    private void CloseModal()
+    {
+        showConfirmModal = false;
+        tableToProcess = null;
+    }
+
+
+    private async Task LoadTables()
+    {
+        try
+        {
+            tables = await Http.GetFromJsonAsync<List<TableResponse>>("api/tables/GetAllTableResponses");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Xəta: {ex.Message}");
+        }
+    }
+    // Modalda "Bəli" basanda bura gəlir
+    private async Task ConfirmClearTable()
+    {
+        if (tableToProcess == null) return;
+
+        try
+        {
+            var response = await Http.PutAsync($"api/Orders/Checkout/{tableToProcess.Id}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadTables();
+                Console.WriteLine("Masa boşaldıldı.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Xəta: {ex.Message}");
+        }
+        finally
+        {
+            CloseModal();
+        }
+    }
+    private void GoToOrder(TableResponse table)
+    {
+        // Masanın ID-sini URL-ə əlavə edərək yeni səhifəyə yönləndiririk
+        Navigation.NavigateTo($"/waiter/orderentry/{table.Id}");
+    }
+}

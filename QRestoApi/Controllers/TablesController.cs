@@ -21,6 +21,12 @@ namespace QRestoApi.Controllers
             var tables = await _tableService.GetAllTablesAsync();
             return Ok(tables);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllTableResponses()
+        {
+            var tables = await _tableService.GetAllTableResponsesAsync();
+            return Ok(tables);
+        }
         // 2. Yeni masa yarat (Ancaq Admin)
         [HttpPost]
         public async Task<IActionResult> InsertTable(InsertTableRequest ınsertTableRequest)

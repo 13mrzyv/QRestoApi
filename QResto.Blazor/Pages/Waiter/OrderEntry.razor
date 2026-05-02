@@ -1,0 +1,215 @@
+﻿@page "/waiter/orderentry/{TableId:int}"
+@using QResto.Blazor.Services
+@using QResto.Shared.DTOs.Responses
+@inject HttpClient Http
+@inject OrderEntryService OrderService
+@inject BasketService BasketService
+@inject NavigationManager NavigationManager
+
+<div class="order-layout">
+
+    <aside class="basket-sidebar">
+        <div class="sidebar-header">
+            <div class="header-top-row">
+                <button class="sidebar-back-btn" @onclick="GoToDashboard" title="Geri qayıt">
+                    &#10229
+                    <i class="oi oi-arrow-left"></i>
+                </button>
+                <h3>Masa #@TableId</h3>
+            </div>
+            <span class="waiter-name">Ofisiant: Polad</span>
+        </div>
+        <div class="orders-list">
+            @if (BasketService.Items != null && BasketService.Items.Any())
+            {
+                <div class="order-group-label">Yeni Sifarişlər</div>
+                @foreach (var item in BasketService.Items)
+                {
+                    <div class="order-card new">
+                        <div class="order-details">
+                            <span class="product-name">@item.ProductName</span>
+                            <span class="product-meta">@item.Quantity ədəd x @item.UnitPrice.ToString("N2") AZN</span>
+                        </div>
+                        @* Sənin metodun: RemoveFromNewItems yerinə servisin içindəki silmə metodu *@
+                        <button class="btn-delete" @onclick="() => BasketService.RemoveFromBasket(item.ProductId)">×</button>
+                    </div>
+                }
+
+                <div class="order-summary">
+                    <strong>Cəmi: @BasketService.Items.Sum(x => x.Quantity * x.UnitPrice).ToString("N2") AZN</strong>
+                    <button class="btn-send-kitchen"
+                            @onclick="HandleSendOrder"
+                            disabled="@(!BasketService.Items.Any())">
+                        Mətbəxə Göndər
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="empty-basket">Səbət boşdur. Sağdan məhsul əlavə edin.</div>
+            }
+
+            <!-- 2. Mövcud Sifarişlər (Kompakt Variant) -->
+            @if (OrderService.ExistingOrder?.Items != null && OrderService.ExistingOrder.Items.Any())
+            {
+                <div class="order-group-label">Mətbəxdə</div>
+                <div class="existing-items-grid">
+                    @foreach (var item in OrderService.ExistingOrder.Items)
+                    {
+                        <div class="compact-order-card">
+                            <span class="compact-name">@item.ProductName</span>
+                            <span class="compact-qty">@item.Quantity ədəd</span>
+                        </div>
+                    }
+                </div>
+            }
+            else if (!OrderService.NewItems.Any())
+            {
+                <p style="padding: 20px; text-align: center; color: #999;">Sifariş başlamaq üçün sağdan məhsul seçin.</p>
+            }
+        </div>
+
+        <!-- 3. AŞAĞI HİSSƏ: Göndər Butonu -->
+        <div class="sidebar-footer">
+            <div class="price-summary">
+                <span>Cəmi Məbləğ:</span>
+                <span class="total-amount">@OrderService.GetTotalAmount().ToString("N2") AZN</span>
+            </div>
+            <button class="btn-submit-order" disabled="@(!OrderService.NewItems.Any())">
+                MƏTBƏXƏ GÖNDƏR
+            </button>
+        </div>
+    </aside>
+
+    <!-- SAĞ SÜTUN: MENYU -->
+    <main class="menu-area">
+
+        <header class="category-header">
+            <div class="category-list">
+                @if (categories != null)
+                {
+                    @foreach (var catName in categories)
+                    {
+                        <button class="category-btn @(selectedCategory == catName ? "active" : "")"
+                                @onclick="() => FilterByCategory(catName)">
+                            @catName
+                        </button>
+                    }
+                }
+            </div>
+        </header>
+
+        <section class="products-container">
+            @if (filteredProducts != null)
+            {
+                @foreach (var product in filteredProducts)
+                {
+                    <div class="product-item">
+                        <div class="product-img-placeholder">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <span>🍽️</span>
+                            }
+                        </div>
+                        <div class="product-text">
+                            <span class="name">@product.Name</span>
+                            <span class="price">@product.Price.ToString("N2") AZN</span>
+                        </div>
+                        @* Sənin metodunu buradan çağırırıq *@
+                        <button class="add-btn" @onclick="() => BasketService.AddToBasket(product)">
+                            <span>+</span>
+                        </button>
+                    </div>
+                }
+            }
+        </section>
+    </main>
+</div>
+
+@code {
+    [Parameter] public int TableId { get; set; }
+    private List<ProductResponse> allProducts; // API-dən gələn tam siyahı
+    private List<ProductResponse> filteredProducts; // Ekranda görünən siyahı
+    private List<string> categories; // Unikal kateqoriya adları
+    private string selectedCategory;
+    private bool animateBasket = false;
+
+    private async Task HandleSendOrder()
+    {
+        // 1. API-ya datanı göndər
+        bool isSuccess = await BasketService.SendOrderToBackend(TableId);
+
+        if (isSuccess)
+        {
+            // 2. Uğurludursa, mesaj ver (və ya özəl bir Modal çıxar)
+            // BasketService daxilində artıq Items.Clear() və LoadActiveOrder çağırılıb
+            Console.WriteLine("Sifariş mətbəxə ötürüldü.");
+        }
+        else
+        {
+            // 3. Xəta olarsa, istifadəçini xəbərdar et
+            Console.WriteLine("Xəta baş verdi, sifariş göndərilmədi.");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. SOL TƏRƏF ÜÇÜN: Masanın bazadakı mövcud sifarişini yükləyirik
+        // TableId parametrini URL-dən alıb servisə ötürürük
+        await OrderService.LoadExistingOrderAsync(TableId);
+        BasketService.OnChange += StateHasChanged;
+
+        // 2. SAĞ TƏRƏF ÜÇÜN: Bütün menyunu bir dəfəyə çəkirik
+        try
+        {
+            allProducts = await Http.GetFromJsonAsync<List<ProductResponse>>("api/Products/GetFullMenu");
+
+            if (allProducts != null && allProducts.Any())
+            {
+                // Məhsulların içindən unikal kateqoriya adlarını çıxarırıq
+                categories = allProducts
+                    .Select(x => x.CategoryName)
+                    .Distinct()
+                    .ToList();
+
+                // İlk kateqoriyanı avtomatik seçirik ki, ekran boş qalmasın
+                if (categories.Any())
+                {
+                    FilterByCategory(categories.First());
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Menyu yüklənərkən xəta: {ex.Message}");
+        }
+
+        // 3. Servisdə dəyişiklik olduqda (məs. yeni nəsə əlavə edəndə) UI-ın yenilənməsi üçün
+        OrderService.OnChange += StateHasChanged;
+    }
+
+    // Səhifədən çıxanda yaddaş sızmasının qarşısını almaq üçün event-dən abunəliyi çıxarırıq
+    public void Dispose() 
+    {
+        OrderService.OnChange -= StateHasChanged;
+        BasketService.OnChange -= StateHasChanged;
+    }
+
+    private void FilterByCategory(string categoryName)
+    {
+        selectedCategory = categoryName;
+        // API-yə getmədən, əlimizdəki siyahını filtr edirik
+        filteredProducts = allProducts
+            .Where(x => x.CategoryName == categoryName && x.IsAvailable)
+            .ToList();
+    }
+    private void GoToDashboard()
+    {
+        BasketService.Items.Clear();
+        NavigationManager.NavigateTo("/waiter/waiterdashboard");
+    }
+}

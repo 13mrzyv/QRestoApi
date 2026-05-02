@@ -1,0 +1,152 @@
+﻿.main-wrapper {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 25px;
+}
+
+.table-card {
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 3px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+    .table-card.free {
+        border-color: #2ecc71;
+    }
+
+    .table-card.busy {
+        border-color: #e74c3c;
+    }
+
+.table-info {
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.table-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.table-status {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    text-transform: uppercase;
+}
+
+/* İkonlar üçün konteyner */
+.table-actions {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: #555;
+}
+
+    .action-btn:hover {
+        transform: scale(1.2);
+    }
+
+.view-btn:hover {
+    color: #3498db;
+}
+
+.deactivate-btn:hover {
+    color: #e67e22;
+}
+
+/* Arxa fonu dumanlandıran və bütün ekranı tutan hissə */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Daha şəffaf qara */
+    backdrop-filter: blur(3px); /* Arxa fonu dumanlandırır */
+    display: flex;
+    align-items: center; /* Şaquli mərkəzləmə */
+    justify-content: center; /* Üfüqi mərkəzləmə */
+    z-index: 9999; /* Hər şeyin üstündə görünsün */
+}
+
+/* Kiçik və qəşəng modal pəncərəsi */
+.confirm-modal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 280px; /* Ölçünü kiçiltdik */
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 1px solid #eee;
+}
+
+.modal-icon {
+    font-size: 2.5rem; /* İkonu kiçiltdik */
+    color: #f39c12;
+    margin-bottom: 8px;
+}
+
+.confirm-modal h4 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.confirm-modal p {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+/* Düymələri daha yığcam etdik */
+.modal-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+    .modal-buttons button {
+        flex: 1;
+        padding: 8px;
+        border-radius: 6px;
+        border: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+.btn-cancel {
+    background: #f1f2f6;
+    color: #57606f;
+}
+
+.btn-confirm {
+    background: #ff4757;
+    color: white;
+}

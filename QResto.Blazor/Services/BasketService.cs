@@ -8,11 +8,16 @@
     public class BasketService
     {
         private readonly HttpClient _http;
+        private readonly OrderEntryService orderService;
         public event Action OnChange;
         public List<OrderItemResponse> Items { get; private set; } = new();
         public List<OrderItemResponse> OrderedItems { get; private set; } = new();
 
-        public BasketService(HttpClient http) => _http = http;
+        public BasketService(HttpClient http, OrderEntryService orderService)
+        {
+            _http = http;
+            this.orderService = orderService;
+        }   
         public void AddToBasket(ProductResponse product)
         {
             var existing = Items.FirstOrDefault(x => x.ProductId == product.Id);
@@ -83,7 +88,8 @@
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadActiveOrder(tableId);
-                    Items.Clear(); 
+                    Items.Clear();
+                    await orderService.LoadExistingOrderAsync(tableId);
                     NotifyDataChanged();
                     return true;
                 }

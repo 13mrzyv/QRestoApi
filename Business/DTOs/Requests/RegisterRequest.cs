@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QResto.Shared.DTOs
+namespace Business.DTOs.Requests
 {
-    public class RegisterDto
+    public class RegisterRequest
     {
         // Ofisiantın tam adı (məsələn: Əli Məmmədov)
         public string FullName { get; set; }
