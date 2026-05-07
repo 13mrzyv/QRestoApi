@@ -630,3 +630,57 @@
     .basket-item-group:last-child {
         border-bottom: none !important;
     }
+
+
+/* ==========================================================================
+   YENİ LAYOUT ÜÇÜN STICKY ACTIONS DÜZƏLİŞİ
+   ========================================================================== */
+
+.sticky-actions {
+    position: absolute;
+    bottom: 30px; /* Home indicator-dan bir az yuxarıda */
+    left: 15px;
+    right: 15px;
+    z-index: 1000;
+    display: flex;
+    gap: 12px;
+    pointer-events: none; /* Arxa tərəfə klikləməyə mane olmasın */
+}
+
+    .sticky-actions .btn {
+        pointer-events: auto; /* Düymələr özü kliklənə bilsin */
+        flex: 1;
+        height: 54px; /* Bir az daha böyük və rahat düymə */
+        border-radius: 16px;
+        font-size: 14px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
+        border: none !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Səbət/Sifariş Düyməsi (Yaşıl) */
+    .sticky-actions .btn-success {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20) !important;
+        color: white !important;
+    }
+
+    /* İmtina/Təmizlə Düyməsi (Qırmızı) */
+    .sticky-actions .btn-danger {
+        background: linear-gradient(135deg, #d32f2f, #b71c1c) !important;
+        color: white !important;
+    }
+
+/* Kiçik ekranlarda (məs. iPhone SE) düymələr çox sıxılmasın */
+.sticky-actions {
+    position: absolute;
+    /* Safari safe area-nı nəzərə alır, yoxdursa 20px qoyur */
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: 15px;
+    right: 15px;
+    z-index: 1000;
+}
