@@ -16,7 +16,9 @@
     flex: 1;
     overflow-y: auto;
     padding: 16px;
-    padding-bottom: 140px; /* Düymələrin üstünə minməməsi üçün */
+    padding-bottom: 140px;
+    -webkit-overflow-scrolling: touch; /* iOS scroll düzəlişi */
+    overscroll-behavior: contain;
 }
 
 /* Kateqoriya Düymələri */
@@ -26,6 +28,7 @@
     gap: 10px;
     padding-bottom: 20px;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
 }
 
     .category-container::-webkit-scrollbar {
@@ -33,7 +36,8 @@
     }
 
 .category-btn {
-    padding: 8px 20px;
+    padding: 0 20px;
+    height: 44px; /* Minimum touch target */
     border-radius: 25px;
     border: 1px solid #333;
     background: #1a1a1a;
@@ -41,12 +45,18 @@
     font-size: 14px;
     white-space: nowrap;
     transition: 0.3s;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
     .category-btn.active {
         background: #2e7d32;
         border-color: #2e7d32;
         font-weight: bold;
+    }
+
+    .category-btn:active {
+        opacity: 0.75;
     }
 
 /* ==========================================================================
@@ -66,7 +76,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    -webkit-tap-highlight-color: transparent;
 }
+
+    .product-card:active {
+        opacity: 0.85;
+    }
 
 .product-img-wrapper {
     position: relative;
@@ -84,21 +99,30 @@
 .product-info {
     position: relative;
     padding: 12px;
+    padding-right: 45px;
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-height: 70px;
 }
 
 .product-name {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
     color: #eee;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
 }
 
 .product-price {
-    font-size: 13px;
+    font-size: 12px;
     color: #2e7d32;
     font-weight: bold;
+    display: block;
 }
 
 /* Kartın üzərindəki dairəvi "+" düyməsi */
@@ -106,8 +130,8 @@
     position: absolute;
     bottom: 10px;
     right: 10px;
-    width: 32px;
-    height: 32px;
+    width: 44px; /* Minimum touch target (əvvəl 32px idi) */
+    height: 44px;
     border-radius: 50%;
     background: #2e7d32;
     color: white;
@@ -143,7 +167,7 @@
     background: rgba(220, 53, 69, 0.9);
     color: white;
     padding: 4px 8px;
-    font-size: 10px;
+    font-size: 12px; /* Əvvəl 10px idi, oxunması üçün artırıldı */
     font-weight: bold;
     border-radius: 6px;
     text-transform: uppercase;
@@ -170,9 +194,9 @@
 }
 
 .detail-modal-wrapper {
-    max-width: 420px; /* modalın ideal eni */
-    width: calc(100% - 32px); /* sağ + sol boşluq yaradır */
-    margin: auto; /* ortalayır */
+    width: calc(100% - 24px);
+    max-width: 420px;
+    margin: auto;
 }
 
 .modal-content {
@@ -186,14 +210,18 @@
     color: #212529 !important;
 }
 
-    .modal-header h5, .modal-content h4, .modal-content h5, .modal-content h6 {
+    .modal-header h5,
+    .modal-content h4,
+    .modal-content h5,
+    .modal-content h6 {
         color: #000000 !important;
         font-weight: 700 !important;
     }
 
 .scrollable-modal-body {
-    max-height: 300px;
+    max-height: 55vh; /* Ekran hündürlüyünə görə dəyişir */
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 15px;
 }
 
@@ -215,8 +243,8 @@
     position: absolute;
     top: 15px;
     right: 15px;
-    width: 32px;
-    height: 32px;
+    width: 44px; /* Minimum touch target (əvvəl 32px idi) */
+    height: 44px;
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(5px);
     border-radius: 50%;
@@ -225,40 +253,43 @@
     align-items: center;
     justify-content: center;
     z-index: 10;
+    cursor: pointer;
     transition: 0.2s;
+    -webkit-tap-highlight-color: transparent;
 }
 
-    .btn-close-circle:hover {
-        transform: rotate(90deg);
+    .btn-close-circle:active {
+        transform: scale(0.88); /* hover əvəzinə :active */
+        background: rgba(255,255,255,1);
     }
 
 /* ==========================================================================
    4. ALT HİSSƏ: AKSİYA PANELİ (SAYĞAC + YAŞIL DÜYMƏ)
    ========================================================================== */
-/* Ana konteyner - Hündürlüyü sərbəst buraxırıq ki, daxilindəkilər sığsın */
 .custom-action-bar {
     background-color: #f8f9fa;
-    border-radius: 18px; /* Bir az daha yumşaq künclər */
-    padding: 8px; /* İç boşluğu artırdıq */
-    height: auto; /* Sabit 65px-i sildik, auto etdik */
-    min-height: 70px; /* Minimum hündürlük təyin etdik */
-    display: flex;
-    align-items: center; /* Elementləri mərkəzdə saxlayır */
+    border-radius: 18px;
     border: 1px solid #eee;
-    gap: 10px; /* Sayğacla düymə arasında məsafə */
+    padding: 8px !important;
+    gap: 10px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 70px !important;
 }
 
-/* Sayğac bölməsi - Ölçünü bir az daha stabil etdik */
 .quantity-control {
-    min-width: 110px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex: 0 0 auto !important;
+    width: 80px !important;
 }
 
 .q-btn {
-    width: 36px !important;
-    height: 36px !important;
+    width: 44px !important; /* Minimum touch target (əvvəl 36px idi) */
+    height: 44px !important;
     background: white !important;
     border-radius: 10px !important;
     display: flex;
@@ -267,49 +298,73 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     border: none !important;
     font-weight: bold;
+    font-size: 18px;
     color: #333 !important;
     padding: 0;
+    transition: transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
 }
+
+    .q-btn:active {
+        transform: scale(0.88);
+    }
 
 .q-amount {
     font-weight: 700;
     font-size: 1rem;
     color: #000;
-    min-width: 20px;
+    width: 40px;
     text-align: center;
+    font-variant-numeric: tabular-nums;
 }
 
-/* Yaşıl Səbət Düyməsi */
+.btn-cart-success,
+.btn-out-of-stock {
+    flex: 3 !important;
+    height: 100% !important;
+    border-radius: 12px !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 10px !important;
+    margin-left: 10px !important;
+    transition: transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+}
+
 .btn-cart-success {
     background-color: #4c8c4a !important;
     color: white !important;
-    border-radius: 15px !important;
-    border: none;
-    height: 100%;
-    flex: 1;
-    padding: 0 !important;
-    overflow: hidden;
-    transition: transform 0.1s;
 }
 
-/* Düymənin daxilindəki mətnlər */
+    .btn-cart-success:active {
+        transform: scale(0.97);
+    }
+
 .btn-cart-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     justify-content: center;
-    /* Əsas düzəlişlər bunlardır: */
-    height: 100%; /* İçindəki hər şeyi mərkəzdə saxlamaq üçün */
-    min-height: 40px; /* Yazıların üst-üstə minməməsi üçün minimum sahə */
-    width: 100%;
+    gap: 2px !important;
+    height: 100%;
 }
 
-.btn-text, .btn-price {
-    line-height: 1.2; /* Yazıların arasındakı sıxlığı aradan qaldırır */
-    display: block; /* Hər yazı öz sətirini tam tutsun */
+.btn-text {
+    font-size: 0.7rem !important;
+    white-space: nowrap !important;
+    line-height: 1.2;
+    display: block;
 }
-.btn-cart-success:active {
-    transform: scale(0.97);
+
+.btn-price {
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2;
+    display: block;
 }
 
 /* ==========================================================================
@@ -329,7 +384,7 @@
     .sticky-actions .btn {
         pointer-events: auto;
         flex: 1;
-        height: 48px;
+        height: 52px; /* Barmaqla rahat basılması üçün artırıldı */
         border-radius: 14px;
         font-size: 13px;
         font-weight: 600;
@@ -338,7 +393,12 @@
         justify-content: center;
         box-shadow: 0 8px 20px rgba(0,0,0,0.3) !important;
         border: none !important;
+        -webkit-tap-highlight-color: transparent;
     }
+
+        .sticky-actions .btn:active {
+            transform: scale(0.96);
+        }
 
 .btn-success {
     background: linear-gradient(135deg, #2e7d32, #1b5e20) !important;
@@ -348,213 +408,49 @@
     background: linear-gradient(135deg, #d32f2f, #b71c1c) !important;
 }
 
-/* Animasiyalar */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-
-
-/*--------------------------------------------------------------------------*/
-
-
-.order-time-vertical {
-    /* istiqamət + dönmə */
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: rotate(-45deg);
-    transform-origin: center;
-    display: inline-block;
-    /* mətn */
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #dc3545;
-    text-align: center;
-    /* görünüş */
-    background: #fff5f5;
-    border: 1px solid #feb2b2;
-    border-left: 2px solid #dee2e6;
-    border-radius: 4px;
-    /* boşluqlar */
-    padding: 1px 4px;
-    padding-left: 5px;
-    margin-right: 15px;
-    min-width: 28px;
-}
-
-/* Sətir daxilində elementlərin hizalanmasını təmin edirik */
+/* ==========================================================================
+   6. SƏBƏT VƏ QEYD BÖLMƏLƏRI
+   ========================================================================== */
 .list-group-item {
     display: flex;
-    align-items: center; /* Elementləri vertikal mərkəzləyir */
+    align-items: center;
     padding-left: 0.5rem !important;
 }
 
-/*.btn-cart-success,
-.btn-out-of-stock {
-    min-width: 150px;
-    max-width: 180px;
+.basket-item-wrapper:last-child,
+.basket-item-group:last-child {
+    border-bottom: none !important;
 }
 
-.q-amount {
-    display: inline-block;
-    width: 32px;*/ /* sabit en */
-    /*text-align: center;*/ /* ortada qalsın */
-    /*font-variant-numeric: tabular-nums;*/ /* rəqəmlərin eni eyni olsun */
-/*}*/
-
-.detail-modal-wrapper {
-    width: calc(100% - 24px);
-    margin: auto;
+.basket-item-group {
+    border-bottom: 1px solid #f8f9fa !important;
 }
 
-.custom-action-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-
+.custom-basket-note {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
 }
 
-.quantity-control {
-    width: 100%;
-    justify-content: center;
-}
-
-.btn-cart-success,
-.btn-out-of-stock {
-    height: 50px !important; /* Hündürlüyü bar-a uyğunlaşdırdıq */
-    border-radius: 12px !important;
-    padding: 0 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.basket-note-input {
+    font-size: 0.8rem !important;
+    color: #666 !important;
     border: none !important;
-    transition: transform 0.1s active;
-    flex-grow: 2;
+    box-shadow: none !important;
 }
 
-    .btn-cart-success:active {
-        transform: scale(0.98); /* Basanda yüngül effekt */
+    .basket-note-input::placeholder {
+        font-style: italic;
+        color: #ccc;
+        font-size: 0.75rem;
     }
 
-.q-amount {
-    width: 40px;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-}
+    .basket-note-input:focus {
+        background-color: #fff !important;
+        border-color: #28a745 !important;
+        box-shadow: none !important;
+    }
 
-/* --- QƏTİ HƏLL: DÜYMƏNİ BÖYÜTMƏK VƏ YAN-YANA DÜZMƏK --- */
-/* YAŞIL DÜYMƏNİ VƏ ANA BAR-I DÜZƏLT */
-
-.custom-action-bar {
-    display: flex !important;
-    flex-direction: row !important; /* Yan-yana düzülüşü məcburi edirik */
-    align-items: center !important;
-    justify-content: space-between !important;
-    height: 70px !important;
-    padding: 8px !important;
-}
-
-.quantity-control {
-    flex: 0 0 auto !important; /* Sayğac yerində sabit qalsın */
-    width: 80px !important;
-}
-
-.btn-cart-success {
-    flex: 3 !important; /* Düymə qalan bütün boşluğu doldursun */
-    height: 100% !important; /* Barın hündürlüyünə uyğunlaşsın */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: 0 10px !important; /* Divarlardan uzaqlaşdırır */
-    margin-left: 10px !important; /* Sayğacla arasında boşluq qoyur */
-}
-
-.btn-cart-content {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 2px !important;
-}
-
-.btn-text {
-    font-size: 0.7rem !important;
-    white-space: nowrap !important; /* Yazının qırılmaması üçün */
-}
-
-.btn-price {
-    font-size: 0.7rem !important;
-    font-weight: 800 !important;
-}
-
-/* Məhsul adı və Qiymət nişanının (Badge) tənzimlənməsi */
-
-.modal-body h3 {
-    font-size: 1.25rem !important; /* Adı bir az kiçiltdik (məs: 20px) */
-    line-height: 1.2 !important;
-    max-width: 70%; /* Adın qiymətin üstünə minməməsi üçün */
-    word-wrap: break-word; /* Çox uzundursa alt sətirə keçsin */
-}
-
-.modal-body .badge {
-    font-size: 0.85rem !important; /* Qiymət yazısını kiçiltdik */
-    padding: 6px 12px !important; /* Qiymət qutusunu yığcamlaşdırdıq */
-    flex-shrink: 0; /* Qiymətin sıxılmasını qadağan etdik */
-    margin-left: 8px; /* Adla arasında minimal məsafə */
-}
-
-/* Əgər təsvir hissəsi də çox yapışıqdırsa: */
-.detail-description-area p {
-    font-size: 0.9rem !important;
-    line-height: 1.4;
-    color: #6c757d !important;
-}
-
-/* Modalın daxili boşluğunu (padding) bir az artıraraq divardan uzaqlaşdıraq */
-.modal-body.p-4 {
-    padding: 1.25rem !important; /* 20px ətrafında boşluq */
-}
-/*]]]]]]]]]]]]]]]]]]]]]]]]]]]*/
-/* 1. Məhsul adının düyməyə dəyməməsi üçün sağdan boşluq veririk */
-.product-info {
-    position: relative;
-    padding: 12px;
-    padding-right: 45px; /* Düymənin eni qədər boşluq qoyuruq ki, yazı ona dəyməsin */
-    display: flex;
-    flex-direction: column;
-    min-height: 70px; /* Kartların hündürlüyünün eyni qalması üçün */
-}
-
-/* 2. Məhsul adını səliqəyə salırıq */
-.product-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #eee;
-    line-height: 1.2;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Ad 2 sətirdən çoxdursa "..." qoyur */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 4px;
-}
-
-/* 3. Qiyməti düymənin altına sürüşməməsi üçün tənzimləyirik */
-.product-price {
-    font-size: 12px;
-    color: #2e7d32;
-    font-weight: bold;
-    display: block;
-}
-
-/* Qeyd Bölməsi Stili */
 .product-note-area {
     margin-bottom: 15px;
 }
@@ -565,14 +461,14 @@
     border-radius: 12px !important;
     font-size: 0.85rem !important;
     color: #495057 !important;
-    resize: none; /* İstifadəçinin ölçünü dəyişməməsi üçün */
+    resize: none;
     padding: 10px 12px !important;
     transition: all 0.2s ease;
 }
 
     .product-note-input:focus {
         background-color: #ffffff !important;
-        border-color: #4c8c4a !important; /* Yaşıl düymə ilə eyni rəng */
+        border-color: #4c8c4a !important;
         box-shadow: 0 0 0 3px rgba(76, 140, 74, 0.1) !important;
         outline: none;
     }
@@ -582,51 +478,62 @@
         font-size: 0.8rem;
     }
 
-
-/* Səbət daxilindəki balaca qeyd girişi */
-.basket-note-input {
-    font-size: 0.75rem !important;
-    color: #666 !important;
-    border-color: #eee !important;
+/* ==========================================================================
+   7. DİGƏR ELEMENTLƏR
+   ========================================================================== */
+.order-time-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(-45deg);
+    transform-origin: center;
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #dc3545;
+    text-align: center;
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-left: 2px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1px 4px;
+    padding-left: 5px;
+    margin-right: 15px;
+    min-width: 28px;
 }
 
-    .basket-note-input::placeholder {
-        font-style: italic;
-        color: #bbb;
+.modal-body h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.2 !important;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.modal-body .badge {
+    font-size: 0.85rem !important;
+    padding: 6px 12px !important;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.modal-body.p-4 {
+    padding: 1.25rem !important;
+}
+
+.detail-description-area p {
+    font-size: 0.9rem !important;
+    line-height: 1.4;
+    color: #6c757d !important;
+}
+
+/* ==========================================================================
+   8. ANİMASİYALAR
+   ========================================================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
 
-    .basket-note-input:focus {
-        background-color: #fff !important;
-        border-color: #28a745 !important; /* Fokuslananda yaşıl rəng */
-        box-shadow: none !important;
+    to {
+        opacity: 1;
     }
-
-.basket-item-wrapper:last-child {
-    border-bottom: none !important;
 }
-/* Qeyd qrupunun ümumi görünüşü */
-.custom-basket-note {
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #f0f0f0;
-}
-
-.basket-note-input {
-    font-size: 0.8rem !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-    .basket-note-input::placeholder {
-        color: #ccc;
-        font-size: 0.75rem;
-    }
-
-/* Ayırıcı xəttin rəngini bir az yumşaldaq */
-.basket-item-group {
-    border-bottom: 1px solid #f8f9fa !important;
-}
-
-    .basket-item-group:last-child {
-        border-bottom: none !important;
-    }
