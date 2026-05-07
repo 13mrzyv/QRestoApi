@@ -57,7 +57,8 @@ namespace Business.Concrete
                     {
                         ProductId = itemReq.ProductId,
                         Quantity = itemReq.Quantity,
-                        UnitPrice = price.Value // Bazadan gələn real qiymət
+                        UnitPrice = price.Value, // Bazadan gələn real qiymət
+                        Note = itemReq.Note
                     });
                 }
                 var order = new Order
@@ -111,7 +112,9 @@ namespace Business.Concrete
                     ProductId = i.ProductId,
                     ProductName = i.Name,
                     Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice
+                    UnitPrice = i.UnitPrice,
+                    OrderDate = i.OrderDate,
+                    Note = i.Note
                 }).ToList()
             };
         }

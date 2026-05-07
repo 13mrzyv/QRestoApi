@@ -1,4 +1,4 @@
-﻿@page "/waiter/orderentry/{TableId:int}"
+﻿@page "/waiter/orderentry/{TableId:int}/{UserName}"
 @using QResto.Blazor.Services
 @using QResto.Shared.DTOs.Responses
 @inject HttpClient Http
@@ -17,7 +17,7 @@
                 </button>
                 <h3>Masa #@TableId</h3>
             </div>
-            <span class="waiter-name">Ofisiant: Polad</span>
+            <span class="waiter-name">Ofisiant: @UserName</span>
         </div>
         <div class="orders-list">
             @if (BasketService.Items != null && BasketService.Items.Any())
@@ -29,8 +29,15 @@
                         <div class="order-details">
                             <span class="product-name">@item.ProductName</span>
                             <span class="product-meta">@item.Quantity ədəd x @item.UnitPrice.ToString("N2") AZN</span>
+                            @* Qeyd Girişi *@
+                            <div class="note-input-wrapper">
+                                <input type="text"
+                                       class="basket-note-input"
+                                       placeholder="Qeyd əlavə et (məs: az duzlu)..."
+                                       @bind="item.Note"
+                                       @bind:event="oninput" />
+                            </div>
                         </div>
-                        @* Sənin metodun: RemoveFromNewItems yerinə servisin içindəki silmə metodu *@
                         <button class="btn-delete" @onclick="() => BasketService.RemoveFromBasket(item.ProductId)">×</button>
                     </div>
                 }
@@ -46,7 +53,7 @@
             }
             else
             {
-                <div class="empty-basket">Səbət boşdur. Sağdan məhsul əlavə edin.</div>
+                <div class="empty-basket">Səbət boşdur.</div>
             }
 
             <!-- 2. Mövcud Sifarişlər (Kompakt Variant) -->
@@ -57,8 +64,12 @@
                     @foreach (var item in OrderService.ExistingOrder.Items)
                     {
                         <div class="compact-order-card">
+                            <span class="compact-hour">
+                                @item.OrderDate.ToString("HH:mm") |
+                            </span>
                             <span class="compact-name">@item.ProductName</span>
-                            <span class="compact-qty">@item.Quantity ədəd</span>
+                            <span class="compact-qty">x @item.Quantity</span>
+                            <span class="product-note">@item.Note</span>
                         </div>
                     }
                 </div>
@@ -71,13 +82,8 @@
 
         <!-- 3. AŞAĞI HİSSƏ: Göndər Butonu -->
         <div class="sidebar-footer">
-            <div class="price-summary">
-                <span>Cəmi Məbləğ:</span>
-                <span class="total-amount">@OrderService.GetTotalAmount().ToString("N2") AZN</span>
-            </div>
-            <button class="btn-submit-order" disabled="@(!OrderService.NewItems.Any())">
-                MƏTBƏXƏ GÖNDƏR
-            </button>
+            <span>Cəmi Məbləğ:</span>
+            <span class="total-amount">@OrderService.GetTotalAmount().ToString("N2") AZN</span>
         </div>
     </aside>
 
@@ -105,22 +111,12 @@
                 @foreach (var product in filteredProducts)
                 {
                     <div class="product-item">
-                        <div class="product-img-placeholder">
-                            @if (!string.IsNullOrEmpty(product.ImageUrl))
-                            {
-                                <img alt="@product.Name" />
-                            }
-                            else
-                            {
-                                <span>🍽️</span>
-                            }
-                        </div>
                         <div class="product-text">
                             <span class="name">@product.Name</span>
                             <span class="price">@product.Price.ToString("N2") AZN</span>
                         </div>
                         @* Sənin metodunu buradan çağırırıq *@
-                        <button class="add-btn" @onclick="() => BasketService.AddToBasket(product)">
+                        <button class="add-btn" @onclick="() => BasketService.AddToBasket(product, productCount)">
                             <span>+</span>
                         </button>
                     </div>
@@ -132,11 +128,13 @@
 
 @code {
     [Parameter] public int TableId { get; set; }
+    [Parameter] public string UserName { get; set; }
     private List<ProductResponse> allProducts; // API-dən gələn tam siyahı
     private List<ProductResponse> filteredProducts; // Ekranda görünən siyahı
     private List<string> categories; // Unikal kateqoriya adları
     private string selectedCategory;
     private bool animateBasket = false;
+    private int productCount = 1;
 
     private async Task HandleSendOrder()
     {
@@ -210,6 +208,6 @@
     private void GoToDashboard()
     {
         BasketService.Items.Clear();
-        NavigationManager.NavigateTo("/waiter/waiterdashboard");
+        NavigationManager.NavigateTo($"/waiter/waiterdashboard/{UserName}");
     }
 }

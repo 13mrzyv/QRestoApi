@@ -13,5 +13,7 @@ namespace Entity
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; } // Sifariş anındakı qiymət
+        public DateTime OrderDate { get; set; } // Sifariş tarixi
+        public string? Note { get; set; } //afsiant notu
     }
 }

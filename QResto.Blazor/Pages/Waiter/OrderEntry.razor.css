@@ -199,7 +199,7 @@
 
 .product-text .name {
     display: block;
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 600;
     color: #333;
     margin-top: 10px;
@@ -251,7 +251,7 @@
     flex-shrink: 0;
     padding: 20px;
     border-top: 2px solid #eee;
-    background: #f9f9f9;
+    background: #e5e5e5;
 }
 
 .total-amount {
@@ -304,3 +304,80 @@
 .basket-animate {
     animation: basket-bounce 0.3s ease-in-out;
 }
+
+/*===========================================================================#################*/
+
+.compact-hour {
+    display: inline-flex;
+    align-items: center;
+    /* Ölçünü kiçiltmək üçün */
+    font-size: 0.7rem;
+    font-weight: 700;
+    /* Qırmızı rəng mövzusu */
+    color: #dc3545; /* Bootstrap qırmızı rəngi */
+    background-color: #fff5f5; /* Çox açıq qırmızı fon */
+    border: 1px solid #ffc1c7; /* Nazik qırmızı çərçivə */
+    /* Forma və boşluqlar */
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    /* Yazının hamısının böyük hərflə görünməsi üçün (istəyə bağlı) */
+    text-transform: uppercase;
+}
+
+.product-note {
+    display: block; /* Qeydin yeni sətirdən başlaması üçün */
+    font-size: 0.7rem; /* Ölçünü yarıya qədər kiçildir */
+    color: #6c757d; /* Yumşaq boz rəng (əsas mətndən fərqlənsin) */
+    font-style: italic; /* Maili yazı (qeyd olduğu vizual bilinsin) */
+    margin-top: 2px; /* Məhsul adı ilə arasında kiçik məsafə */
+    padding-left: 5px; /* Sola bitişik olmasın */
+    border-left: 2px solid #dee2e6; /* Sol tərəfə nazik xətt (opsional, şık görünür) */
+    line-height: 1.2; /* Sətir arası məsafəni daraldır */
+}
+
+/* Məhsulun adı üçün */
+.compact-name {
+    font-size: 0.9rem;
+    font-weight: 700; /* Şrifti tam dolğun (bold) edir */
+    color: #2d3748; /* Tünd, kəskin bir rəng */
+    margin-right: 8px; /* Miqdar ilə arasında məsafə */
+}
+
+/* Miqdar (x Sayı) üçün */
+.compact-qty {
+    font-size: 0.85rem;
+    font-weight: 800; /* Adan daha da dolğun görünməsi üçün */
+    color: #dc3545; /* Qırmızı tonlarda (diqqət çəkməsi üçün) */
+    background: #fff5f5; /* Çox yüngül fon rəngi */
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+/*pdddddddddddddddddddddddddd*/
+.note-input-wrapper {
+    margin-top: 8px;
+}
+
+.basket-note-input {
+    width: 100%;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background-color: #f8fafc;
+    color: #4a5568;
+    transition: all 0.2s;
+}
+
+    .basket-note-input:focus {
+        outline: none;
+        border-color: #cbd5e0;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 2px rgba(203, 213, 224, 0.2);
+    }
+
+    .basket-note-input::placeholder {
+        font-style: italic;
+        color: #a0aec0;
+    }

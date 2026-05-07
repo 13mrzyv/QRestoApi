@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@* @page "/"  *@
 @page "/menu"
 @layout CustomerLayout
 @using QResto.Blazor.Services
@@ -120,15 +120,36 @@
                         <div class="list-group list-group-flush scrollable-modal-body">
                             @foreach (var item in BasketService.OrderedItems)
                             {
-                                <div class="list-group-item d-flex justify-content-between py-3 bg-white border-bottom">
-                                    <div>
+                                @* <div class="list-group-item d-flex justify-content-between py-3 bg-white border-bottom">
+                                    <div> *@
+                                        @* Məhsul adı - Tünd qara *@
+                                        @* <h6 class="mb-0 fw-bold text-dark">@item.ProductName</h6> *@
+                                        @* Miqdar və vahid qiymət - Boz/Tünd boz *@
+                                    @*     <small class="text-secondary fw-semibold">@item.Quantity ədəd x @item.UnitPrice.ToString("0.00") AZN</small>
+                                    </div> *@
+                                    @* Sətir üzrə cəm məbləğ - Tünd göy/qara *@
+                                @*     <span class="fw-bold text-dark">@(item.UnitPrice* item.Quantity) AZN</span>
+                                </div> *@
+                                <div class="list-group-item d-flex align-items-center justify-content-between py-3 bg-white border-bottom">
+
+                                    @* 1. SOL HİSSƏ: Sifariş Saatı *@
+                                    @* <div class="order-time-badge me-3">
+                                        @item.OrderDate.ToString("HH:mm")
+                                    </div> *@
+                                    <div class="order-time-vertical me-2">
+                                        @item.OrderDate.ToString("HH:mm")
+                                    </div>
+
+                                    @* 2. ORTA HİSSƏ: Məhsul Adı və Miqdarı *@
+                                    <div class="flex-grow-1">
                                         @* Məhsul adı - Tünd qara *@
                                         <h6 class="mb-0 fw-bold text-dark">@item.ProductName</h6>
                                         @* Miqdar və vahid qiymət - Boz/Tünd boz *@
                                         <small class="text-secondary fw-semibold">@item.Quantity ədəd x @item.UnitPrice.ToString("0.00") AZN</small>
                                     </div>
-                                    @* Sətir üzrə cəm məbləğ - Tünd göy/qara *@
-                                    <span class="fw-bold text-dark">@(item.UnitPrice* item.Quantity) AZN</span>
+
+                                    @* 3. SAĞ HİSSƏ: Sətir üzrə cəm məbləğ *@
+                                    <span class="fw-bold text-dark ms-2">@((item.UnitPrice * item.Quantity).ToString("0.00")) AZN</span>
                                 </div>
                             }
                         </div>
@@ -193,18 +214,38 @@
                             {
                                 @foreach (var item in BasketService.Items)
                                 {
-                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                                        <div class="d-flex align-items-center">
-                                            <button class="btn btn-sm btn-outline-danger rounded-circle me-3"
-                                                    @onclick="() => BasketService.RemoveFromBasket(item.ProductId)">
-                                                ×
-                                            </button>
-                                            <div class="text-start">
-                                                <h6 class="mb-0 fw-bold">@item.ProductName</h6>
-                                                <small class="text-muted">@item.UnitPrice AZN</small>
+                                    @* Hər bir məhsulu və onun qeydini bir qrupda birləşdiririk *@
+                                    <div class="basket-item-group mb-4 pb-2 border-bottom">
+
+                                        @* Üst hissə: Sil düyməsi, Ad, Qiymət və Say *@
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <button class="btn btn-sm btn-outline-danger rounded-circle me-3"
+                                                        @onclick="() => BasketService.RemoveFromBasket(item.ProductId)"
+                                                        style="width: 28px; height: 28px; line-height: 1;">
+                                                    ×
+                                                </button>
+                                                <div class="text-start">
+                                                    <h6 class="mb-0 fw-bold">@item.ProductName</h6>
+                                                    <small class="text-muted">@item.UnitPrice AZN</small>
+                                                </div>
+                                            </div>
+                                            <span class="fw-bold text-dark">@item.Quantity ədəd</span>
+                                        </div>
+
+                                        @* Alt hissə: Qeyd sahəsi (Adın hizasında olması üçün ps-5 əlavə edildi) *@
+                                        <div class="mt-2 ps-5">
+                                            <div class="input-group input-group-sm custom-basket-note">
+                                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                                    <i class="bi bi-pencil-fill" style="font-size: 0.7rem;"></i>
+                                                </span>
+                                                <input type="text"
+                                                       class="form-control border-start-0 ps-0 bg-light basket-note-input"
+                                                       placeholder="Sifariş qeydi..."
+                                                       @bind="item.Note"
+                                                       @bind:event="oninput" />
                                             </div>
                                         </div>
-                                        <span class="fw-bold">@item.Quantity ədəd</span>
                                     </div>
                                 }
                                 <div class="d-flex justify-content-between mt-3 px-1 fs-5 fw-bold">
@@ -253,21 +294,40 @@
                             <p class="text-muted">@(SelectedProduct.Description ?? "Təsvir yoxdur.")</p>
                         </div>
 
-                        @* Əməliyyat Düyməsi *@
-                        <div class="mt-4">
-                            <button class="btn @(SelectedProduct.IsAvailable ? "btn-add-to-basket" : "btn-out-of-stock") w-100 py-3"
-                                    disabled="@(!SelectedProduct.IsAvailable)"
-                                    @onclick="() => { BasketService.AddToBasket(SelectedProduct); CloseModal(); }">
-                                @if (SelectedProduct.IsAvailable)
-                                {
-                                    <span>Səbətə əlavə et</span>
-                                }
-                                else
-                                {
-                                    <span>Tükənib</span>
-                                }
-                            </button>
+                        @* --- QEYD BÖLMƏSİ --- *@
+                        <div class="product-note-area mt-3">
+                            <label class="form-label small fw-bold text-muted mb-1">
+                                <i class="bi bi-pencil-square"></i> Sifariş qeydi:
+                            </label>
+                            <textarea class="form-control product-note-input"
+                                      placeholder="Sifariş qeydi (məs: buzsuz, az şəkərli...)"
+                                      rows="2"
+                                      @bind="SelectedProduct.Note"
+                                      @bind:event="oninput"></textarea>
                         </div>
+
+                        <div class="mt-4 px-0 pb-3">
+                            <div class="d-flex align-items-center gap-2 custom-action-bar">
+
+                               @*   Sayğac - Daha yığcam (Balacalaşdırılmış) *@
+                                <div class="quantity-control d-flex align-items-center justify-content-between">
+                                    <button class="btn q-btn minus" @onclick="DecrementCount">−</button>
+                                    <span class="q-amount">@productCount</span>
+                                    <button class="btn q-btn plus" @onclick="IncrementCount">+</button>
+                                </div>
+
+                                @* Səbət düyməsi - Daha uzun (Genişləndirilmiş) *@
+                                <button class="btn @(SelectedProduct.IsAvailable ? "btn-cart-success" : "btn-out-of-stock") flex-grow-1"
+                                        disabled="@(!SelectedProduct.IsAvailable)"
+                                        @onclick="() => { BasketService.AddToBasket(SelectedProduct, productCount); CloseModal(); }">
+                                    <div class="btn-cart-content">
+                                        <span class="btn-text">əlavə et</span>
+                                        @* <span class="btn-divider"></span> *@
+                                        <span class="btn-price">@((SelectedProduct.Price * productCount).ToString("0.00")) AZN</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>              
                     </div>
                 </div>
             </div>
@@ -285,6 +345,7 @@
     bool isBasketOpen = false;
     bool isOrdering = false;
     bool orderSuccess = false;
+    private int productCount = 1;
     //Hazrki masa
     int currentTableId = 3;
 
@@ -296,10 +357,23 @@
     private ProductResponse? SelectedProduct; // Seçilmiş məhsulu yadda saxlamaq üçün
     private bool _isButtonClicked = false;
 
+    private void IncrementCount()
+    {
+        productCount++;
+    }
+
+    private void DecrementCount()
+    {
+        if (productCount > 1)
+        {
+            productCount--;
+        }
+    }
+
     private async Task HandleQuickAdd(ProductResponse productResponse)
     {
         _isButtonClicked = true; // Düyməyə basıldığını qeyd edirik
-        BasketService.AddToBasket(productResponse);
+        BasketService.AddToBasket(productResponse, productCount);
 
         // Qısa müddət sonra bayrağı endiririk ki, növbəti kliklər işləsin
         await Task.Delay(100);
@@ -311,11 +385,18 @@
         // Əgər düyməyə basılıbsa, modal açılmasın
         if (_isButtonClicked) return;
         SelectedProduct = productResponse; // Hansı məhsula basılıbsa onu mənimsədirik
+        productCount = 1; // Hər dəfə yeni modal açılanda 1-dən başlasın 
     }
 
     private void CloseModal()
     {
+        if (SelectedProduct != null)
+        {
+            // Növbəti dəfə açanda qeyd hissəsi təmiz olsun deyə:
+            SelectedProduct.Note = "";
+        }
         SelectedProduct = null; // Modalı bağlamaq üçün seçimi sıfırlayırıq
+        productCount = 1;
     }
 
     // Tək OnInitializedAsync kifayətdir, hər iki işi burada görürük

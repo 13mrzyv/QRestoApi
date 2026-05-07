@@ -18,12 +18,14 @@
             _http = http;
             this.orderService = orderService;
         }   
-        public void AddToBasket(ProductResponse product)
+        public void AddToBasket(ProductResponse product, int quantity)
         {
             var existing = Items.FirstOrDefault(x => x.ProductId == product.Id);
             if (existing != null)
             {
-                existing.Quantity++;
+                //existing.Quantity++;
+                // ++ yerinə gələn miqdarı (quantity) üzərinə gəlirik
+                existing.Quantity += quantity;
             }
             else
             {
@@ -31,8 +33,9 @@
                 {
                     ProductId = product.Id,
                     ProductName = product.Name,
-                    Quantity = 1,
-                    UnitPrice = product.Price
+                    Quantity = quantity,
+                    UnitPrice = product.Price,
+                    Note = product.Note
                 });
             }
             NotifyDataChanged();
@@ -80,7 +83,8 @@
                     {
                         ProductId = x.ProductId,
                         Quantity = x.Quantity,
-                        Price = x.UnitPrice
+                        Price = x.UnitPrice,
+                        Note = x.Note
                     }).ToList()
                 };
                 var response = await _http.PostAsJsonAsync("api/Orders/CreateOrder", orderRequest);

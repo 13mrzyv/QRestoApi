@@ -11,5 +11,6 @@ namespace QResto.Shared.DTOs.Requests
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal  Price { get; set; } // Səbətdəki qiymət, backend-də yoxlanacaq
+        public string? Note { get; set; }
     }
 }

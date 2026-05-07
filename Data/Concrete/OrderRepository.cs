@@ -27,8 +27,8 @@ namespace Data.Concrete
 
         public async Task InsertOrderItemsAsync(List<OrderItem> items)
         {
-            var sql = @"INSERT INTO OrderItems (OrderId, ProductId, Quantity, UnitPrice) 
-                   VALUES (@OrderId, @ProductId, @Quantity, @UnitPrice)";
+            var sql = @"INSERT INTO OrderItems (OrderId, ProductId, Quantity, UnitPrice, Note) 
+                   VALUES (@OrderId, @ProductId, @Quantity, @UnitPrice, @Note)";
 
             await _connection.ExecuteAsync(sql, items, _transaction);
         }
@@ -39,7 +39,7 @@ namespace Data.Concrete
         }
         public async Task<IEnumerable<dynamic>> GetOrderItemsByOrderIdAsync(int id)
         {
-            var sql = @"SELECT  p.Id AS ProductId, p.Name, oi.Quantity, oi.UnitPrice
+            var sql = @"SELECT  p.Id AS ProductId, p.Name, oi.Quantity, oi.UnitPrice, oi.OrderDate, oi.Note
                 FROM OrderItems oi
                 JOIN Products p ON oi.ProductId = p.Id
                 WHERE oi.OrderId = @OrderId";

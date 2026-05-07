@@ -12,5 +12,7 @@ namespace QResto.Shared.DTOs.Responses
         public string ProductName { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public DateTime OrderDate { get; set; }
+        public string? Note { get; set; }
     }
 }

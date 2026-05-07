@@ -1,4 +1,5 @@
-﻿@page "/login"
+﻿@page "/"
+@page "/login"
 @using QResto.Blazor.Services
 @* @using QResto.Shared.DTOs *@
 @using QResto.Shared.DTOs.Responses
@@ -49,11 +50,11 @@
             // 3. Rola görə yönləndirmə
             if (result.Role == "Admin")
             {
-                NavManager.NavigateTo("/admin/admindashboard");
+                NavManager.NavigateTo($"/admin/admindashboard/{result.Username}");
             }
             else if (result.Role == "Waiter")
             {
-                NavManager.NavigateTo("/waiter/waiterdashboard");
+                NavManager.NavigateTo($"/waiter/waiterdashboard/{result.Username}");
             }
             else
             {
