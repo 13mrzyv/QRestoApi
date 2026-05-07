@@ -16,7 +16,7 @@
     flex: 1;
     overflow-y: auto;
     padding: 16px;
-    padding-bottom: 140px;
+    padding-bottom: calc(140px + env(safe-area-inset-bottom));
     -webkit-overflow-scrolling: touch; /* iOS scroll düzəlişi */
     overscroll-behavior: contain;
 }
@@ -371,14 +371,18 @@
    5. ANA EKRANIN ALTINDA SABİTLƏNƏN DÜYMƏLƏR
    ========================================================================== */
 .sticky-actions {
-    position: absolute;
-    bottom: 20px;
-    left: 15px;
-    right: 15px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 1000;
     display: flex;
     gap: 10px;
     pointer-events: none;
+    padding: 12px 15px;
+    /* iPhone X+ alt çıxıntısını (home bar) avtomatik tanıyır */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 60%, transparent);
 }
 
     .sticky-actions .btn {
