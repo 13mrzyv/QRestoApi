@@ -1,64 +1,108 @@
-﻿/* Səhifənin daxili strukturu */
-.menu-page-wrapper {
+﻿/* ==========================================================================
+   1. GLOBAL MOBİL OPTİMİZASİYA (SAFARI & ANDROID)
+   ========================================================================== */
+:root {
+    /* iPhone-un aşağıdakı xətti (Home Indicator) üçün boşluq dəyişəni */
+    --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+html, body {
+    position: fixed; /* Safari-də bütün səhifənin "atılıb-düşməsini" bloklayır */
+    width: 100%;
     height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ==========================================================================
+   2. MAIN STRUCTURE (VIEWPORT)
+   ========================================================================== */
+.menu-page-wrapper {
+    height: 100dvh; /* Dinamik hündürlük - klaviatura açılanda düzgün daralır */
     display: flex;
     flex-direction: column;
     background-color: #000;
+    position: relative;
+    overflow: hidden;
 }
 
 .menu-header {
-    padding-top: 20px;
+    padding-top: calc(10px + env(safe-area-inset-top)); /* Notch (kəsik) olan telefonlar üçün */
     background: linear-gradient(to bottom, #1a1a1a, #000);
+    flex-shrink: 0;
 }
 
 .menu-title {
     text-align: center;
     font-weight: 800;
-    font-size: 1.4rem;
-    margin-bottom: 15px;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: #fff;
+    letter-spacing: -0.5px;
 }
 
-/* Scroll sahəsi - İndi tam peşəkar işləyəcək */
+/* ==========================================================================
+   3. SCROLL AREA (YAĞ KİMİ SÜRÜŞMƏ)
+   ========================================================================== */
 .products-scroll-area {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 16px 120px 16px; /* Alt boşluq düymələr üçün */
-    -webkit-overflow-scrolling: touch; /* iOS-da yağ kimi sürüşməsi üçün */
+    padding: 10px 16px calc(140px + var(--safe-area-bottom)) 16px;
+    /* iOS Safari-də sürüşmənin rəvan olması üçün mütləqdir */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
 }
 
-/* Alt Düymələr - Sticky məntiqi */
+    .products-scroll-area::-webkit-scrollbar {
+        display: none; /* Chrome/Safari scrollbar gizlədir */
+    }
+
+/* ==========================================================================
+   4. STICKY ACTIONS (DÜYMƏLƏR)
+   ========================================================================== */
 .sticky-footer-actions {
     position: absolute;
-    bottom: 25px; /* Home indicator üçün yer saxlayırıq */
-    left: 15px;
-    right: 15px;
+    bottom: var(--safe-area-bottom); /* iPhone xəttindən tam yuxarıda durur */
+    left: 16px;
+    right: 16px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     z-index: 1000;
+    padding-bottom: 5px;
 }
 
 .action-btn {
     width: 100%;
-    padding: 16px;
-    border-radius: 16px;
+    height: 56px; /* Daha premium və rahat toxunuş ölçüsü */
+    border-radius: 18px;
     border: none;
-    font-weight: 600;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-    transition: transform 0.2s;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent; /* Toxunanda yaranan göy kölgəni silir */
 }
 
     .action-btn:active {
         transform: scale(0.96);
+        filter: brightness(0.9);
     }
 
 .btn-orders {
-    background-color: #dc3545;
-    color: white;
+    background: #222;
+    color: #fff;
+    border: 1px solid #333;
 }
 
 .btn-basket {
-    background-color: #2e7d32;
+    background: linear-gradient(135deg, #2e7d32, #1b5e20);
     color: white;
 }
 
@@ -66,17 +110,41 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
+    padding: 0 5px;
 }
 
-/* MODALLARIN ÇƏRÇİVƏYƏ HƏBSİ */
-/* Bu hissə çox vacibdir, modallar artıq bütün ekranı yox, yalnız "telefonu" tutacaq */
+/* ==========================================================================
+   5. PROFESSIONAL MODAL OVERLAY
+   ========================================================================== */
 .custom-modal-overlay {
     position: absolute !important;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px); /* Daha müasir "Glassmorphism" effekti */
+    -webkit-backdrop-filter: blur(8px);
     z-index: 1500;
+    display: flex;
+    align-items: flex-end; /* Modalı aşağıdan yuxarı açılan (Mobile sheet) edir */
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Məhsul kartlarının kənarlarını yumşaltmaq */
+.product-card {
+    border-radius: 20px !important;
+    border: 1px solid #222 !important;
+    background: #111 !important;
 }
