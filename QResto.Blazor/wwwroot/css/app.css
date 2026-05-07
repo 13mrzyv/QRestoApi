@@ -20,12 +20,13 @@ html, body {
 /* ==========================================================================
    2. MAIN STRUCTURE (VIEWPORT)
    ========================================================================== */
+/* 2. Menu wrapper-i hündürlüyünü məhdudlaşdırırıq */
 .menu-page-wrapper {
-    height: 100dvh; /* Dinamik hündürlük - klaviatura açılanda düzgün daralır */
+    position: relative;
+    width: 100%;
+    height: 100%; /* .app-viewport-un hündürlüyünü götürür */
     display: flex;
     flex-direction: column;
-    background-color: #000;
-    position: relative;
     overflow: hidden;
 }
 
@@ -63,31 +64,19 @@ html, body {
 /* ==========================================================================
    4. STICKY ACTIONS (DÜYMƏLƏR)
    ========================================================================== */
+/* 3. Düymələrin olduğu footer hissəsi */
 .sticky-footer-actions {
     position: absolute;
-    bottom: var(--safe-area-bottom); /* iPhone xəttindən tam yuxarıda durur */
-    left: 16px;
-    right: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    /* env(safe-area-inset-bottom) Safari-nin alt çubuğundan yuxarıda qalmağı təmin edir */
+    bottom: calc(15px + env(safe-area-inset-bottom));
+    left: 15px;
+    right: 15px;
     z-index: 1000;
-    padding-bottom: 5px;
+    pointer-events: none; /* Arxa fonun sürüşməsinə mane olmasın */
 }
 
 .action-btn {
-    width: 100%;
-    height: 56px; /* Daha premium və rahat toxunuş ölçüsü */
-    border-radius: 18px;
-    border: none;
-    font-weight: 700;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    transition: all 0.2s ease;
-    -webkit-tap-highlight-color: transparent; /* Toxunanda yaranan göy kölgəni silir */
+    pointer-events: auto; /* Düymələr kliklənsin */
 }
 
     .action-btn:active {
@@ -123,13 +112,18 @@ html, body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px); /* Daha müasir "Glassmorphism" effekti */
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 1500;
-    display: flex;
-    align-items: flex-end; /* Modalı aşağıdan yuxarı açılan (Mobile sheet) edir */
-    animation: modalFadeIn 0.3s ease;
+    height: 100%; /* .menu-page-wrapper-in içində qalsın */
+    display: flex !important;
+    align-items: center !important; /* Modalı tam mərkəzdə açır */
+    justify-content: center;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.modal-content {
+    /* Modallar çox uzun olsa, alt hissəsi kəsilməsin deyə max-height veririk */
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    margin-bottom: env(safe-area-inset-bottom);
 }
 
 @keyframes modalFadeIn {
