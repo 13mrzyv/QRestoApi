@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-
 <div class="phone-frame-container">
     <div class="phone-model">
         <div class="phone-screen">
@@ -8,7 +7,11 @@
         <div class="phone-home-bar"></div>
     </div>
 </div>
+
 <style>
+    /* ================================================
+           KOMPÜTER: Telefon çərçivəsi göstərilir
+           ================================================ */
     .phone-frame-container {
         background-color: #0d0d0d;
         min-height: 100vh;
@@ -25,7 +28,7 @@
         border: 12px solid #222;
         border-radius: 45px;
         position: relative;
-        overflow: hidden; /* İçindəki hər şeyi burada həbs edir */
+        overflow: hidden;
         box-shadow: 0 0 50px rgba(0,0,0,0.8);
     }
 
@@ -34,10 +37,9 @@
         width: 100%;
         height: 100%;
         background-color: #000;
-        overflow: hidden; /* Əsas ekran sürüşmür, yalnız daxilindəki məhsullar sürüşür */
+        overflow: hidden;
     }
 
-        /* Modalların çərçivəyə həbs edilməsi */
         .phone-screen .modal,
         .phone-screen .custom-modal-overlay {
             position: absolute !important;
@@ -59,5 +61,41 @@
         border-radius: 10px;
         pointer-events: none;
         z-index: 1100;
+    }
+
+    /* ================================================
+           TELEFON: Çərçivə yox, tam ekran normal səhifə
+           ================================================ */
+    @@media (max-width: 768px) {
+        .phone-frame-container {
+            background-color: #000;
+            min-height: 100vh;
+            min-height: 100dvh; /* Dynamic viewport — brauzer panelini hesablar */
+            display: block;
+            padding: 0;
+            margin: 0;
+        }
+
+    .phone-model {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        background: #000;
+    }
+
+    .phone-screen {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    /* Telefonda home bar gizlədilir — real cihazın özündə var */
+    .phone-home-bar {
+        display: none;
+    }
+
     }
 </style>
