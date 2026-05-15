@@ -14,6 +14,7 @@ namespace Data.Abstract
         IOrderRepository OrdersRepository { get; }
         IOrderItemRepository OrderItemsRepository { get; }  
         IReportsRepository ReportsRepository { get; }
+        IExpenseRepository ExpensesRepository { get; }
         void BeginTransaction();
         void Commit();
         void Rollback();

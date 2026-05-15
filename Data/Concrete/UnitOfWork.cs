@@ -19,6 +19,7 @@ namespace Data.Concrete
         private IOrderRepository _orderRepository;
         private IOrderItemRepository _orderItemRepository;
         private IReportsRepository _reportsRepository;
+        private IExpenseRepository _expenseRepository;
 
         public UnitOfWork(DbContext dbContext)
         {
@@ -35,24 +36,65 @@ namespace Data.Concrete
 
         public IOrderItemRepository OrderItemsRepository => _orderItemRepository ??= new OrderItemRepository(_connection, _transaction);
         public IReportsRepository ReportsRepository => _reportsRepository ??= new ReportsRepository(_connection, _transaction);
+        public IExpenseRepository ExpensesRepository => _expenseRepository ??= new ExpenseRepository(_connection, _transaction);    
 
         public void BeginTransaction() => _transaction = _connection.BeginTransaction();
 
+        //public void Commit()
+        //{
+        //    _transaction?.Commit();
+        //    Dispose();
+        //}
+
+        //public void Rollback()
+        //{
+        //    _transaction?.Rollback();
+        //    Dispose();
+        //}
+
+        //public void Dispose()
+        //{
+        //    _transaction?.Dispose();
+        //    _connection?.Dispose();
+        //}
+
         public void Commit()
         {
-            _transaction?.Commit();
-            Dispose();
+            try
+            {
+                _transaction?.Commit();
+            }
+            finally
+            {
+                // Tranzaksiyanı təmizləyirik ki, eyni UnitOfWork daxilində 
+                // növbəti sorğular (məs: çap üçün adların çəkilməsi) tranzaksiyasız davam edə bilsin.
+                _transaction?.Dispose();
+                _transaction = null;
+            }
         }
 
         public void Rollback()
         {
-            _transaction?.Rollback();
-            Dispose();
+            try
+            {
+                _transaction?.Rollback();
+            }
+            finally
+            {
+                _transaction?.Dispose();
+                _transaction = null;
+            }
         }
 
         public void Dispose()
         {
+            // Bu metod avtomatik olaraq HTTP Request-in sonunda (Controller-dən cavab qayıdanda) 
+            // .NET tərəfindən çağırılacaq. Bağlantı məhz burada tamamilə qapanacaq.
             _transaction?.Dispose();
+            if (_connection != null && _connection.State != ConnectionState.Closed)
+            {
+                _connection.Close();
+            }
             _connection?.Dispose();
         }
     }

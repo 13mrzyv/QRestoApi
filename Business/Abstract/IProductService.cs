@@ -19,5 +19,6 @@ namespace Business.Abstract
         Task<bool> UpdateProductByIdAsync(int id, InsertProductRequest insertProductRequest);
         Task<bool> DeleteProductByIdAsync(int id);
         Task<List<ProductResponse>> GetFullMenuAsync();
+        Task<bool> UpdateProductStatusAsync(int id, bool status);
     }
 }

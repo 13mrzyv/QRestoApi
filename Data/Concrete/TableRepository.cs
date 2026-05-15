@@ -46,5 +46,11 @@ namespace Data.Concrete
             var sql = "SELECT Status FROM Tables WHERE Id = @Id";
             return await _connection.QuerySingleOrDefaultAsync<int>(sql, new { Id = id }, transaction: _transaction);
         }
+
+        public async  Task<string> GetTableNumberByTableIdAsync(int tableId)
+        {
+            var sql = "SELECT TableNumber FROM Tables WHERE Id = @TableId";
+            return await _connection.QuerySingleOrDefaultAsync<string>(sql, new { TableId = tableId }, transaction: _transaction);
+        }
     }
 }

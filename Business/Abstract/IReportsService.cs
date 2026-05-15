@@ -10,5 +10,6 @@ namespace Business.Abstract
     public interface IReportsService
     {
         Task<DailyReportResponse> GetDailyEarningsAsync(DateTime? date);
+        Task<TotalSalesResponse> GetTotalSalesAsync(DateTime startDate, DateTime endDate);
     }
 }

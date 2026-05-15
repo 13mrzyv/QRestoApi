@@ -2,12 +2,14 @@
 using Data.Abstract;
 using Entity;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Data.Concrete
 {
@@ -63,6 +65,27 @@ namespace Data.Concrete
         {
             var sql = "UPDATE Orders SET TotalAmount = @TotalAmount WHERE Id = @Id";
             await _connection.ExecuteAsync(sql, new { TotalAmount = newTotalAmount, Id = orderId }, _transaction);
+        }
+        public async Task<IEnumerable<OrderWithTableNumber>> GetOrdersByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            var sql = @"
+        SELECT o.*, t.TableNumber as TableNumber 
+        FROM Orders o
+        JOIN Tables t ON o.TableId = t.Id
+        WHERE CAST(o.OrderDate AS DATE) BETWEEN CAST(@StartDate AS DATE) AND CAST(@EndDate AS DATE)
+        ORDER BY o.Id DESC";
+
+            return await _connection.QueryAsync<OrderWithTableNumber>(sql, new
+            {
+                StartDate = startDate,
+                EndDate = endDate
+            }, transaction: _transaction);
+        }
+
+        public async Task<int> NumberOfActiveOrdersAsync()
+        {
+            var sql = "SELECT COUNT(*) FROM Orders WHERE Status = 1;";
+            return await _connection.QuerySingleAsync<int>(sql, transaction: _transaction);
         }
     }
 }

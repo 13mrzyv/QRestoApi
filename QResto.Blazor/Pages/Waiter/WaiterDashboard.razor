@@ -1,15 +1,18 @@
 @* @page "/" *@
-@page "/waiter/waiterdashboard/{UserName}"
+@page "/waiter/waiterdashboard"
+@using Microsoft.AspNetCore.SignalR.Client
+@using QResto.Blazor.Services
 @using QResto.Shared.DTOs.Responses
 @layout QResto.Blazor.Layouts.WaiterLayout
 @inject HttpClient Http
 @inject IJSRuntime JsRuntime
 @inject NavigationManager Navigation
+@inject UserProvider userProvider
 
 <div class="main-wrapper">
     <div class="content-area">
         <h3 class="page-title">Zalın Vəziyyəti</h3>
-        <h3 class="page-title">Waiter - @UserName</h3>
+        <h3 class="page-title">Waiter - @userProvider.Username</h3>
 
         @if (tables == null)
         {
@@ -84,14 +87,28 @@
 </div>
 
 @code {
-    [Parameter] public string UserName { get; set; }
+    // [Parameter] public string UserName { get; set; }
     private List<TableResponse> tables;
     private bool showConfirmModal = false;
     private TableResponse tableToProcess;
+    private HubConnection? hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadTables();
+
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl("https://localhost:7001/orderHub") // API portun
+        .WithAutomaticReconnect()
+        .Build();
+
+        hubConnection.On("ReceiveOrderUpdate", async () =>
+        {
+            await LoadTables();
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();   
     }
     private void ClearTable(TableResponse table)
     {
@@ -143,6 +160,6 @@
     private void GoToOrder(TableResponse table)
     {
         // Masanın ID-sini URL-ə əlavə edərək yeni səhifəyə yönləndiririk
-        Navigation.NavigateTo($"/waiter/orderentry/{table.Id}/{UserName}");
+        Navigation.NavigateTo($"/waiter/orderentry/{table.Id}");
     }
 }

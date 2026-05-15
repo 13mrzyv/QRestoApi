@@ -19,6 +19,12 @@
         {
             _http = http; // Əgər bu sətir yoxdursa, _http null qalacaq
         }
+
+        public async Task<bool> UpdateProductStatusAsync(int productId, bool newStatus)
+        {
+            var response = await _http.PutAsJsonAsync($"api/Products/UpdateStatus/{productId}", newStatus);
+            return response.IsSuccessStatusCode;
+        }
         public async Task LoadExistingOrderAsync(int tableId)
         {
             try

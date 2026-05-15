@@ -1,0 +1,405 @@
+﻿/* ── ÜMUMİ ── */
+.dash {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc; /* Əsas admin panelindəki yüngül boz-mavi fon */
+    min-height: 100vh;
+}
+
+/* ── ÜST BAR ── */
+.topbar {
+    background: #ffffff; /* Sənin admin panelindəki kimi təmiz ağ üst bar */
+    color: #1e293b;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #1e293b; /* Tünd yazı */
+}
+
+.logo-white {
+    color: #6366f1; /* Sənin əsas rəngin olan bənövşəyi/göy çaları */
+}
+
+.topbar-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    border-left: 1.5px solid #cbd5e1;
+    padding-left: 14px;
+    margin: 0;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #6366f1; /* Sağ yuxarıdakı 'A' loqosu rəngi */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* ── YUXARI KARTLAR ── */
+.cards-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 24px 24px 0;
+}
+
+.fin-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+    .fin-card .label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .fin-card .amount {
+        font-size: 28px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #1e293b;
+    }
+
+    .fin-card .sub {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 6px;
+    }
+
+/* Sənin panelindəki Ödənilmiş və Aktiv Masa rəng tonlarına uyğun statuslar */
+.green-amt {
+    color: #10b981; /* Yaşıl uğurlu balans */
+}
+
+.amber-amt {
+    color: #f59e0b; /* Xərc rəngi */
+}
+
+.blue-amt {
+    color: #6366f1; /* Xalis mənfəət (Əsas İndigo rəngi) */
+}
+
+.trend-icon {
+    font-size: 18px;
+}
+
+    .trend-icon.up {
+        color: #10b981;
+    }
+
+    .trend-icon.down {
+        color: #f59e0b;
+    }
+
+    .trend-icon.check {
+        color: #6366f1;
+    }
+
+/* ── ƏSAS LAYOUT ── */
+.main-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px 24px 24px;
+}
+
+/* ── PANEL (KART) ── */
+.panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #1e293b;
+    margin: 0;
+}
+
+.add-btn {
+    background: #6366f1; /* Düymələr üçün bənövşəyi/göy tonu */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .add-btn:hover {
+        background: #4f46e5;
+    }
+
+/* ── XƏRCLƏR CƏDVƏLİ ── */
+.expense-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+    .expense-table th {
+        text-align: left;
+        padding: 12px 20px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc; /* Sənin cədvəlin üst hissəsi kimi açıq boz */
+    }
+
+    .expense-table td {
+        padding: 12px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+    }
+
+        .expense-table td.amt {
+            color: #ef4444; /* Xərc rəqəmləri üçün qırmızı alert tonu */
+            font-weight: 600;
+        }
+
+        .expense-table td.time-col {
+            color: #94a3b8;
+        }
+
+/* ── XƏRC FORMU ── */
+.form-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #f1f5f9;
+    background: #f8fafc;
+}
+
+.form-input {
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #ffffff;
+    color: #1e293b;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+    .form-input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+.submit-btn {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+    .submit-btn:hover {
+        background: #4f46e5;
+    }
+
+/* ── SAĞ SÜTUN ── */
+.right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ── TOP SELLING ── */
+.top-selling-list {
+    padding: 0;
+}
+
+.top-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.rank-badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.rank-1 {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fcd34d;
+}
+
+.rank-2 {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.rank-3 {
+    background: #ffedd5;
+    color: #ea580c;
+    border: 1px solid #fed7aa;
+}
+
+.rank-n {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.item-name {
+    flex: 1;
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.item-sold {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ── SAXLANILAN QRAFİK SAHƏSİ ── */
+.chart-area {
+    padding: 20px;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.legend-item {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.rev-dot {
+    background: #10b981;
+}
+
+.prof-dot {
+    background: #6366f1; /* Mənfəət qrafik rəngini əsas mövzuya uyğunlaşdırdıq */
+}
+
+.bars-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 140px;
+    padding-top: 10px;
+}
+
+.bar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 6px;
+}
+
+.bar-group {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    min-width: 8px;
+    transition: opacity 0.2s;
+}
+
+    .bar:hover {
+        opacity: 0.85;
+    }
+
+.bar-rev {
+    background: #10b981;
+}
+
+.bar-prof {
+    background: #6366f1;
+}
+
+.day-lbl {
+    font-size: 11px;
+    color: #64748b;
+    text-align: center;
+    white-space: nowrap;
+    font-weight: 500;
+}

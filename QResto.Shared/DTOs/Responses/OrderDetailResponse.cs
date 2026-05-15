@@ -10,6 +10,7 @@ namespace QResto.Shared.DTOs.Responses
     {
         public int OrderId { get; set; }
         public int TableId { get; set; }
+        public string TableNumber { get; set; }
         public decimal TotalAmount { get; set; }
         public List<OrderItemResponse> Items { get; set; } // İçindəki məhsullar
     }

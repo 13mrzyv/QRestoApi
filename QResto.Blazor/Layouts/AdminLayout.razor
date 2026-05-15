@@ -1,6 +1,88 @@
-﻿@inherits LayoutComponentBase
-<h3>AdminLayout</h3>
+﻿@using QResto.Blazor.Services
+@inherits LayoutComponentBase
+@inject UserProvider userProvider
+<div class="admin-wrapper">
+    <!-- Yan Panel (Sidebar) -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">🍽</span>
+            <span class="logo-text">RESTORAN LOQO</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <NavLink class="nav-item" href="/admin/finance" Match="NavLinkMatch.All">
+                <span class="nav-icon">📊</span>
+                <span>İdarə Paneli</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="/admin/menu">
+                <span class="nav-icon">🍔</span>
+                <span>Menyu İdarəetmə</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="/admin/tables">
+                <span class="nav-icon">🪑</span>
+                <span>Masa İdarəetmə</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="/admin/staff">
+                <span class="nav-icon">👤</span>
+                <span>Heyət</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="/admin/orders">
+                <span class="nav-icon">📋</span>
+                <span>Sifariş Tarixi</span>
+            </NavLink>
+
+            <NavLink class="nav-item" href="/admin/settings">
+                <span class="nav-icon">⚙️</span>
+                <span>Parametrlər</span>
+            </NavLink>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="signout-btn" @onclick="SignOut">Çıxış</button>
+        </div>
+    </aside>
+
+    <!-- Əsas Məzmun -->
+    <div class="main-content">
+        <!-- Üst Panel (Header) -->
+        <header class="topbar">
+            <h1 class="page-title">İDARƏ PANELİ</h1>
+
+            <div class="topbar-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Məhsul axtar..." class="search-input" />
+            </div>
+
+            <div class="topbar-actions">
+                <button class="notif-btn">
+                    🔔
+                    <span class="notif-badge">3</span>
+                </button>
+                <div class="user-info">
+                    <span class="user-name">@userProvider.Username (Admin)</span>
+                    <div class="user-avatar">A</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Səhifə Məzmunu -->
+        <main class="page-body">
+            @Body
+        </main>
+    </div>
+</div>
 
 @code {
+    private void SignOut()
+    {
+        // Çıxış məntiqi burada yazılacaq
+        NavigationManager.NavigateTo("/login");
+    }
 
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 }
+

@@ -1,4 +1,5 @@
-﻿using Business.Abstract;
+﻿using AutoMapper;
+using Business.Abstract;
 using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
@@ -16,9 +17,11 @@ namespace Business.Concrete
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public OrderService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
         public async Task PlaceOrderAsync(CreateOrderRequest request)
         {
@@ -96,7 +99,7 @@ namespace Business.Concrete
             }
         }
 
-        public async Task<OrderDetailResponse> GetOrderDetailsAsync(int tableId)
+        public async Task<OrderDetailResponse> GetActiveOrderDetailsAsync(int tableId)
         {
             var order = await _unitOfWork.OrdersRepository.GetActiveOrderByTableIdAsync(tableId);
             if (order == null)
@@ -106,6 +109,30 @@ namespace Business.Concrete
             {
                 OrderId = order.Id,
                 TableId = order.TableId,
+                TotalAmount = order.TotalAmount,
+                Items = items.Select(i => new OrderItemResponse
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Name,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice,
+                    OrderDate = i.OrderDate,
+                    Note = i.Note
+                }).ToList()
+            };
+        }
+        public async Task<OrderDetailResponse> GetOrderDetailsByIdAsync(int orderId)
+        {
+            var order = await _unitOfWork.OrdersRepository.GetOrderByIdAsync(orderId);
+            if (order == null)
+                return null;
+            var items = await _unitOfWork.OrdersRepository.GetOrderItemsByOrderIdAsync(orderId);
+            var tableNumber = await _unitOfWork.TablesRepository.GetTableNumberByTableIdAsync(order.TableId);
+            return new OrderDetailResponse
+            {
+                OrderId = order.Id,
+                TableId = order.TableId,
+                TableNumber = tableNumber,
                 TotalAmount = order.TotalAmount,
                 Items = items.Select(i => new OrderItemResponse
                 {
@@ -143,6 +170,17 @@ namespace Business.Concrete
         {
             var activeOrder = await _unitOfWork.OrdersRepository.GetActiveOrderByTableIdAsync(tableId);
             return activeOrder;
+        }
+        public async Task<IEnumerable<OrderSummaryResponse>> GetOrdersByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            var results = await _unitOfWork.OrdersRepository.GetOrdersByDateRangeAsync(startDate, endDate);
+            var response = _mapper.Map<IEnumerable<OrderSummaryResponse>>(results);
+            return response;
+        }
+        public async Task<int> NumberOfActiveOrdersAsync()
+        {
+            var result = await _unitOfWork.OrdersRepository.NumberOfActiveOrdersAsync();
+            return result;
         }
     }
 }

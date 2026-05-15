@@ -6,8 +6,9 @@
 @inject HttpClient Http
 @inject NavigationManager NavManager
 @inject AuthService AuthService
+@inject UserProvider userProvider
 
-<div class="d-flex justify-content-center align-items-center" style="height: 80vh;">git 
+<div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
     <div class="card p-4 shadow-lg" style="width: 350px; border-radius: 15px;">
         <h3 class="text-center mb-4">QResto Giriş</h3>
 
@@ -46,15 +47,16 @@
         {
             // 2. Cavabı oxuyuruq
             var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-
+            userProvider.Username = result.Username;
+            userProvider.Role = result.Role;
             // 3. Rola görə yönləndirmə
             if (result.Role == "Admin")
             {
-                NavManager.NavigateTo($"/admin/admindashboard/{result.Username}");
+                NavManager.NavigateTo($"/admin/admindashboard");
             }
             else if (result.Role == "Waiter")
             {
-                NavManager.NavigateTo($"/waiter/waiterdashboard/{result.Username}");
+                NavManager.NavigateTo($"/waiter/waiterdashboard");
             }
             else
             {

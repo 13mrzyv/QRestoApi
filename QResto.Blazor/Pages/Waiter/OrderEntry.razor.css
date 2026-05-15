@@ -1,5 +1,5 @@
-﻿/* ==========================================================================
-   1. ANA LAYOUT (LAYOUT & CONTAINERS)
+﻿/* ==========================================================================*/
+   /*1. ANA LAYOUT (LAYOUT & CONTAINERS)
    ========================================================================== */
 .order-layout {
     display: grid;
@@ -381,3 +381,63 @@
         font-style: italic;
         color: #a0aec0;
     }
+
+/*    _____________________________________________________*/
+/* Stopda olan məhsul üçün stil */
+/*.product-out-of-stock {
+    opacity: 0.4;  
+    filter: grayscale(1);
+    pointer-events: none; 
+    cursor: not-allowed;
+    position: relative;
+}
+
+    .product-out-of-stock::after {
+        content: "TÜKƏNİB";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-15deg);
+        background: rgba(255, 0, 0, 0.7);
+        color: white;
+        padding: 2px 10px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        border-radius: 4px;
+    }
+*/
+
+/* 1. Ümumi Stop-List stili */
+.product-out-of-stock {
+    opacity: 0.4;
+    filter: grayscale(1);
+    /* Ofisiant üçün klikləri bloklayırıq */
+    pointer-events: none;
+    cursor: not-allowed;
+    position: relative;
+}
+
+/* 2. Admin üçün klikləri "AÇIRIQ" */
+/* Əgər div-də həm product-item, həm də is-admin klası varsa, klikləri aktiv et */
+.product-item.is-admin {
+    pointer-events: auto !important;
+    cursor: context-menu;
+}
+
+/* 3. Tükənib yazısı (toxunmadıq, eyni qaldı) */
+.product-out-of-stock::after {
+    content: "TÜKƏNİB";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 4px;
+    z-index: 5;
+    /* Yazının özü klikləməyə mane olmasın */
+    pointer-events: none;
+}

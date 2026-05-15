@@ -1,10 +1,12 @@
-﻿@page "/waiter/orderentry/{TableId:int}/{UserName}"
+﻿@page "/waiter/orderentry/{TableId:int}"
 @using QResto.Blazor.Services
 @using QResto.Shared.DTOs.Responses
+@using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient Http
 @inject OrderEntryService OrderService
 @inject BasketService BasketService
 @inject NavigationManager NavigationManager
+@inject UserProvider userProvider       
 
 <div class="order-layout">
 
@@ -17,7 +19,7 @@
                 </button>
                 <h3>Masa #@TableId</h3>
             </div>
-            <span class="waiter-name">Ofisiant: @UserName</span>
+            <span class="waiter-name">Ofisiant: @userProvider.Username</span>
         </div>
         <div class="orders-list">
             @if (BasketService.Items != null && BasketService.Items.Any())
@@ -104,19 +106,24 @@
                 }
             </div>
         </header>
-
         <section class="products-container">
             @if (filteredProducts != null)
             {
                 @foreach (var product in filteredProducts)
                 {
-                    <div class="product-item">
+                    <!-- IsAvailable false-dursa, solğunluq klasını yapışdırırıq -->
+                    <div class="product-item @(product.IsAvailable ? "" : "product-out-of-stock") @(userProvider.IsAdmin ? "is-admin" : "")"
+                         @oncontextmenu="() => HandleRightClick(product)"
+                         @oncontextmenu:preventDefault="true">
                         <div class="product-text">
                             <span class="name">@product.Name</span>
                             <span class="price">@product.Price.ToString("N2") AZN</span>
                         </div>
-                        @* Sənin metodunu buradan çağırırıq *@
-                        <button class="add-btn" @onclick="() => BasketService.AddToBasket(product, productCount)">
+
+                        <button class="add-btn"
+                                @onclick="() => BasketService.AddToBasket(product, productCount)"
+                                disabled="@(!product.IsAvailable)">
+                            <!-- Həm də düyməni söndürürük -->
                             <span>+</span>
                         </button>
                     </div>
@@ -128,7 +135,7 @@
 
 @code {
     [Parameter] public int TableId { get; set; }
-    [Parameter] public string UserName { get; set; }
+    private HubConnection? hubConnection;
     private List<ProductResponse> allProducts; // API-dən gələn tam siyahı
     private List<ProductResponse> filteredProducts; // Ekranda görünən siyahı
     private List<string> categories; // Unikal kateqoriya adları
@@ -153,28 +160,74 @@
             Console.WriteLine("Xəta baş verdi, sifariş göndərilmədi.");
         }
     }
+    private async Task HandleRightClick(ProductResponse product)
+    {
+        // Yalnız Admin statusu dəyişə bilsin
+        if (!userProvider.IsAdmin) return;
+
+        // Mövcud statusun əksini göndəririk
+        bool targetStatus = !product.IsAvailable;
+
+        // Servis vasitəsilə API-a müraciət
+        bool success = await OrderService.UpdateProductStatusAsync(product.Id, targetStatus);
+
+        if (success)
+        {
+            // Uğurludursa, yerli siyahıda (allProducts) statusu yeniləyirik
+            var prod = allProducts.FirstOrDefault(p => p.Id == product.Id);
+            if (prod != null)
+            {
+                prod.IsAvailable = targetStatus;
+
+                // Filtri yenidən tətbiq edirik ki, vizual dərhal dəyişsin
+                FilterByCategory(selectedCategory);
+                StateHasChanged();
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. SOL TƏRƏF ÜÇÜN: Masanın bazadakı mövcud sifarişini yükləyirik
-        // TableId parametrini URL-dən alıb servisə ötürürük
-        await OrderService.LoadExistingOrderAsync(TableId);
+        // 1. Öncə abunəliklər
         BasketService.OnChange += StateHasChanged;
+        OrderService.OnChange += StateHasChanged;
 
-        // 2. SAĞ TƏRƏF ÜÇÜN: Bütün menyunu bir dəfəyə çəkirik
+        // 2. Öncə DATANI YÜKLƏ (Bu mütləqdir, çünki SignalR bu datanı istifadə edəcək)
+        await LoadMenuData();
+        await LoadExistingOrder();
+
+        // 3. Ən sonda SignalR-ı başlat
+        await SetupSignalR();
+    }
+    private async Task LoadExistingOrder()
+    {
         try
         {
+            // Masanın bazadakı mövcud sifarişini yükləyirik
+            await OrderService.LoadExistingOrderAsync(TableId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Sifariş yüklənərkən xəta: {ex.Message}");
+        }
+    }
+
+    private async Task LoadMenuData()
+    {
+        try
+        {
+            // Bütün menyunu çəkirik
             allProducts = await Http.GetFromJsonAsync<List<ProductResponse>>("api/Products/GetFullMenu");
 
             if (allProducts != null && allProducts.Any())
             {
-                // Məhsulların içindən unikal kateqoriya adlarını çıxarırıq
+                // Kateqoriyaları unikal olaraq çıxarırıq
                 categories = allProducts
                     .Select(x => x.CategoryName)
                     .Distinct()
                     .ToList();
 
-                // İlk kateqoriyanı avtomatik seçirik ki, ekran boş qalmasın
+                // İlk kateqoriyanı seçirik
                 if (categories.Any())
                 {
                     FilterByCategory(categories.First());
@@ -185,9 +238,37 @@
         {
             Console.WriteLine($"Menyu yüklənərkən xəta: {ex.Message}");
         }
+    }
 
-        // 3. Servisdə dəyişiklik olduqda (məs. yeni nəsə əlavə edəndə) UI-ın yenilənməsi üçün
-        OrderService.OnChange += StateHasChanged;
+    private async Task SetupSignalR()
+    {
+        // 1. Bağlantını qururuq
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7001/orderHub")
+            .Build();
+
+        // 2. Dinləyicini (Listener) aktiv edirik
+        hubConnection.On<int, bool>("ReceiveStockUpdate", (productId, isAvailable) =>
+        {
+            var product = allProducts?.FirstOrDefault(p => p.Id == productId);
+            if (product != null)
+            {
+                product.IsAvailable = isAvailable;
+                FilterByCategory(selectedCategory);
+                InvokeAsync(StateHasChanged);
+            }
+        });
+
+        // 3. Bağlantını başladırıq
+        try
+        {
+            await hubConnection.StartAsync();
+            Console.WriteLine("SignalR bağlantısı uğurla quruldu.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SignalR xətası: {ex.Message}");
+        }
     }
 
     // Səhifədən çıxanda yaddaş sızmasının qarşısını almaq üçün event-dən abunəliyi çıxarırıq
@@ -200,14 +281,13 @@
     private void FilterByCategory(string categoryName)
     {
         selectedCategory = categoryName;
-        // API-yə getmədən, əlimizdəki siyahını filtr edirik
         filteredProducts = allProducts
-            .Where(x => x.CategoryName == categoryName && x.IsAvailable)
+            .Where(x => x.CategoryName == categoryName)
             .ToList();
     }
     private void GoToDashboard()
     {
         BasketService.Items.Clear();
-        NavigationManager.NavigateTo($"/waiter/waiterdashboard/{UserName}");
+        NavigationManager.NavigateTo($"/waiter/waiterdashboard/{userProvider.Username}");
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Business.Abstract;
-using Microsoft.AspNetCore.Mvc;
 using Business.DTOs.Requests;
+using Entity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace QRestoApi.Controllers
 {
@@ -9,10 +11,12 @@ namespace QRestoApi.Controllers
     public class ProductsController : Controller
     {
         private readonly IProductService _productService;
+        private readonly IHubContext<OrderHub> _hubContext;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, IHubContext<OrderHub> hubContext)
         {
             _productService = productService;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -75,6 +79,20 @@ namespace QRestoApi.Controllers
                 return NotFound();
             }
             return NoContent();
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] bool isAvailable)
+        {
+            var result = await _productService.UpdateProductStatusAsync(id, isAvailable);
+
+            if (!result)
+            {
+                return NotFound(new { Message = "Məhsul tapılmadı və ya status dəyişdirilmədi." });
+            }
+
+            await _hubContext.Clients.All.SendAsync("ReceiveStockUpdate", id, isAvailable);
+
+            return Ok();
         }
 
 

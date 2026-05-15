@@ -1,5 +1,8 @@
 ﻿using Business.Abstract;
+using Business.Abstract.Print;
+using Business.BackgroundServices;
 using Business.Concrete;
+using Business.Concrete.Print;
 using Business.Mapper;
 using Business.Validators.Requests;
 using Data;
@@ -14,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QRestoApi;
 using QRestoApi.Middlewares;
 using System.Text;
 
@@ -23,6 +27,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderRequestValidator>();
@@ -68,6 +74,14 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IReportsService, ReportsService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IPrintPrepService, PrintPrepService>();
+builder.Services.AddSingleton<IPrintQueue, PrintQueue>();
+
+builder.Services.AddHostedService<PrintWorker>();
+
+builder.Services.AddTransient<IPrintService, MockPrintService>();
+
 
 
 
@@ -113,14 +127,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 1. CORS-u əlavə et
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        // Burada ulduz (*) yerinə Blazor proyektinin ünvanlarını dəqiq yazırıq
+        policy.WithOrigins("https://localhost:7182", "http://localhost:7182")
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials(); // İndi bu düzgün işləyəcək
     });
 });
 
@@ -135,13 +150,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseCors("AllowAll");
+app.MapHub<OrderHub>("/orderHub");
 
 app.MapControllers();
 

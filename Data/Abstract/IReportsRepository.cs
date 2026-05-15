@@ -9,5 +9,6 @@ namespace Data.Abstract
     public interface IReportsRepository
     {
         Task<dynamic> GetDailyReportAsync(DateTime date);
+        Task<dynamic> GetTotalSalesAsync(DateTime startDate, DateTime endDate);
     }
 }

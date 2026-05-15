@@ -56,6 +56,16 @@ namespace Data.Concrete
             var sql = "SELECT Price FROM Products WHERE Id = @Id AND IsDeleted = 0";
             return await _connection.QueryFirstOrDefaultAsync<decimal?>(sql, new { Id = id }, transaction: _transaction);
         }
+        public async Task<bool> UpdateProductStatusAsync(int id, bool isAvailable)
+        {
+            var sql = "UPDATE Products SET IsAvailable = @IsAvailable WHERE Id = @Id AND IsDeleted = 0";
+            var affectedRows = await _connection.ExecuteAsync(sql, new { Id = id, IsAvailable = isAvailable }, transaction: _transaction);
+            return affectedRows > 0;
+        }
+
+
+
+
         //public async Task<string> GetProductNameByIdAsync(int id)
         //{
         //    var sql = "SELECT Name FROM Products WHERE Id = @Id AND IsDeleted = 0";

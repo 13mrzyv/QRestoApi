@@ -13,8 +13,11 @@ namespace Business.Abstract
     public interface IOrderService
     {
         Task PlaceOrderAsync(CreateOrderRequest request);
-        Task<OrderDetailResponse> GetOrderDetailsAsync(int tableId);
+        Task<OrderDetailResponse> GetActiveOrderDetailsAsync(int tableId);
         Task CheckoutAsync(int tableId);
         Task<Order> GetActiveOrderIdByTableIdAsync(int tableId);
+        Task<IEnumerable<OrderSummaryResponse>> GetOrdersByDateRangeAsync(DateTime startDate, DateTime endDate);
+        Task<int> NumberOfActiveOrdersAsync();
+        Task<OrderDetailResponse> GetOrderDetailsByIdAsync(int orderId);
     }
 }

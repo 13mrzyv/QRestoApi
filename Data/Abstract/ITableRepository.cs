@@ -14,5 +14,6 @@ namespace Data.Abstract
         Task UpdateTableStatusAsync(int id, int status);
         Task<int> GetTableStatusAsync(int id);
         Task<IEnumerable<dynamic>> GetAllTablesDynamicAsync();
+        Task<string> GetTableNumberByTableIdAsync(int tableId);
     }
 }

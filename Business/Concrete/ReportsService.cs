@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
-    public class ReportsService:IReportsService
+    public class ReportsService : IReportsService
     {
         private readonly IUnitOfWork _unitOfWork;
         public ReportsService(IUnitOfWork unitOfWork)
@@ -35,6 +35,15 @@ namespace Business.Concrete
                 Date = result.ReportDate ?? targetDate,
                 TotalRevenue = result.TotalRevenue ?? 0m,
                 TotalOrders = result.TotalOrders ?? 0
+            };
+        }
+        public async Task<TotalSalesResponse> GetTotalSalesAsync(DateTime startDate, DateTime endDate)
+        {
+            var result = await _unitOfWork.ReportsRepository.GetTotalSalesAsync(startDate, endDate);
+            return new TotalSalesResponse
+            {
+                CompletedTotal = result.CompletedTotal ?? 0m,
+                ActiveTotal = result.ActiveTotal ?? 0m
             };
         }
     }

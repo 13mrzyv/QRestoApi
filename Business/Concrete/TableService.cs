@@ -56,6 +56,9 @@ namespace Business.Concrete
             await _unitOfWork.TablesRepository.UpdateTableStatusAsync(id, status);
         }
 
-
+        public async Task<string> GetTableNumberByTableIdAsync(int tableId)
+        {
+            return await _unitOfWork.TablesRepository.GetTableNumberByTableIdAsync(tableId);
+        }
     }
 }

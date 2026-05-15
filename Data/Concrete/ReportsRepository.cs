@@ -29,5 +29,17 @@ namespace Data.Concrete
             return await _connection.QuerySingleOrDefaultAsync<dynamic>(sql, new { Date = date }, _transaction);
 
         }
+        public async Task<dynamic> GetTotalSalesAsync(DateTime startDate, DateTime endDate)
+        {
+            var sql = @"
+            SELECT 
+                ISNULL(SUM(CASE WHEN Status = 2 THEN TotalAmount ELSE 0 END), 0) AS CompletedTotal,
+                ISNULL(SUM(CASE WHEN Status = 1 THEN TotalAmount ELSE 0 END), 0) AS ActiveTotal
+            FROM Orders
+            WHERE CAST(OrderDate AS DATE) BETWEEN CAST(@StartDate AS DATE) AND CAST(@EndDate AS DATE)";
+
+            // Dapper parametr olaraq DateTime-ı özü düzgün formata salacaq
+            return await _connection.QueryFirstOrDefaultAsync<dynamic>(sql, new { StartDate = startDate, EndDate = endDate }, _transaction);
+        }
     }
 }

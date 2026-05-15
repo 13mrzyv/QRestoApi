@@ -61,5 +61,11 @@ namespace QRestoApi.Controllers
                 return StatusCode(500, new { message = "Xəta baş verdi: " + ex.Message });
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> GetTableNumberByTableId(int tableId)
+        {
+            var tableNumber = await _tableService.GetTableNumberByTableIdAsync(tableId);
+            return Ok(tableNumber);
+        }
     }
 }

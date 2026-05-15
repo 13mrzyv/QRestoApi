@@ -16,6 +16,7 @@ namespace Data.Abstract
         Task<int> UpdateProductAsync(Product product);
         Task<int> DeleteProductAsync(int id);
         Task<decimal?> GetProductPriceByIdAsync(int id);
+        Task<bool> UpdateProductStatusAsync(int id, bool isAvailable);
         //Task<string> GetProductNameByIdAsync(int id);
 
         //Task DeleteAsync(int id);

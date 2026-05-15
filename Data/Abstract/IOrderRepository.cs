@@ -16,5 +16,7 @@ namespace Data.Abstract
         public Task UpdateOrderStatusAsync(int orderId,int newStatus);
         Task<Order?> GetActiveOrderByTableIdAsync(int tableId);
         Task UpdateTotalAmountByIdAsync(int orderId, decimal newTotalAmount);
+        Task<IEnumerable<OrderWithTableNumber>> GetOrdersByDateRangeAsync(DateTime startDate, DateTime endDate);
+        Task<int> NumberOfActiveOrdersAsync();
     }
 }

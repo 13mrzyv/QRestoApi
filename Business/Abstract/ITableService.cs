@@ -15,6 +15,7 @@ namespace Business.Abstract
         Task<IEnumerable<TableResponse>> GetAllTableResponsesAsync();
         Task CreateTableAsync(InsertTableRequest insertTableRequest);
         Task UpdateTableStatusAsync(int id, int status);
+        Task <string> GetTableNumberByTableIdAsync(int tableId);
 
     }
 }

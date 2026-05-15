@@ -6,10 +6,10 @@ namespace QRestoApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class ReportsConroller : ControllerBase
+    public class ReportsController : ControllerBase
     {
         private readonly IReportsService _reportsService;
-        public ReportsConroller(IReportsService reportsService)
+        public ReportsController(IReportsService reportsService)
         {
             _reportsService = reportsService;
         }
@@ -18,6 +18,12 @@ namespace QRestoApi.Controllers
         public async Task<IActionResult> GetDailySummary([FromQuery] DateTime? date)
         {
             var result = await _reportsService.GetDailyEarningsAsync(date);
+            return Ok(result);
+        }
+        [HttpGet("{startDate}/{endDate}")]
+        public async Task<IActionResult> GetTotalSales(DateTime startDate, DateTime endDate)
+        {
+            var result = await _reportsService.GetTotalSalesAsync(startDate, endDate);
             return Ok(result);
         }
     }

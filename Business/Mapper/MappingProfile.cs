@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Entity;
 using System;
@@ -16,7 +17,8 @@ namespace Business.Mapper
         {
             // Product -> ProductResponse
             CreateMap<Product, ProductResponse>();
-
+            CreateMap<OrderWithTableNumber, OrderSummaryResponse>();
+            CreateMap<CreateExpenseRequest, Expense>();
             // Gələcəkdə digər mapping-lər də bura gələcək:
             // CreateMap<Category, CategoryDto>();
         }

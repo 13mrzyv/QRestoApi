@@ -103,7 +103,11 @@ namespace Business.Concrete
             }
             await _unitOfWork.ProductsRepository.DeleteProductAsync(id);
             return true;
-
+        }
+        public async Task<bool> UpdateProductStatusAsync(int id, bool status)
+        {
+            // Burada əlavə biznes yoxlamaları (məsələn: məhsulun mövcudluğunu yoxlamaq) edilə bilər.
+            return await _unitOfWork.ProductsRepository.UpdateProductStatusAsync(id, status);
         }
     }
 }
