@@ -10,5 +10,6 @@ namespace Data.Abstract
     {
         Task<dynamic> GetDailyReportAsync(DateTime date);
         Task<dynamic> GetTotalSalesAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<dynamic>> GetTopSellingProductsAsync(DateTime startDate, DateTime endDate, int? categoryId);
     }
 }

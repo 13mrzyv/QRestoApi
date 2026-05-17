@@ -1,6 +1,7 @@
 ﻿/* ================================================
    ADMIN PANELİ - QResto
-   wwwroot/css/admin.css
+   wwwroot/css/admin.css  →  Yalnız qlobal stillər
+   (Dashboard stilleri → AdminDashboard.razor.css-ə köçürüldü)
    ================================================ */
 
 :root {
@@ -264,702 +265,10 @@
         background: var(--page-bg);
     }
 
-    /* ================================================
-   DASHBOARD - BAŞLIQ VƏ FİLTR
-   ================================================ */
-
-    .admin-wrapper .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        gap: 20px;
-    }
-
-    .admin-wrapper .dashboard-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0;
-    }
-
-    .admin-wrapper .date-picker-container {
-        display: flex;
-        align-items: flex-end;
-        gap: 12px;
-        background: #ffffff;
-        padding: 8px 15px;
-        border-radius: 12px;
-        border: 1px solid #f1f5f9;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-
-    .admin-wrapper .date-input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .admin-wrapper .input-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .admin-wrapper .date-display-wrapper {
-        position: relative;
-        width: 145px;
-        height: 38px;
-        overflow: hidden;
-        border-radius: 8px;
-    }
-
-    .admin-wrapper .real-date-input {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        z-index: 10;
-        cursor: pointer;
-    }
-
-        .admin-wrapper .real-date-input::-webkit-calendar-picker-indicator {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            cursor: pointer;
-        }
-
-    .admin-wrapper .fake-date-input {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        padding: 0 10px;
-        font-size: 13px;
-        color: #334155;
-        z-index: 5;
-        pointer-events: none;
-    }
-
-        .admin-wrapper .fake-date-input::after {
-            content: '\f133';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            position: absolute;
-            right: 10px;
-            color: #94a3b8;
-            font-size: 12px;
-        }
-
-    .admin-wrapper .filter-ok-btn {
-        height: 38px;
-        background-color: #6366f1;
-        color: white;
-        border: none;
-        padding: 0 18px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 13px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s ease;
-    }
-
-        .admin-wrapper .filter-ok-btn:hover {
-            background-color: #4f52d9;
-        }
-    /* ================================================
-   DASHBOARD - STATİSTİKA KARTLARI
-   ================================================ */
-
-    .admin-wrapper .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        margin-bottom: 24px;
-    }
-
-@media (max-width: 1100px) {
-    .admin-wrapper .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 640px) {
-    .admin-wrapper .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.admin-wrapper .stat-card {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 22px 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-height: 110px;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #f0f0f4;
-    transition: box-shadow 0.2s;
-}
-
-    .admin-wrapper .stat-card:hover {
-        box-shadow: 0 4px 18px rgba(91, 94, 244, 0.10);
-    }
-
-    /* Günlük Gəlir kartı sütun istiqamətli olur */
-    .admin-wrapper .stat-card.daily-income-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-.admin-wrapper .stat-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    flex-shrink: 0;
-}
-
-.admin-wrapper .revenue-icon {
-    background: #eef0ff;
-}
-
-.admin-wrapper .table-icon {
-    background: #f0f4f8;
-}
-
-.admin-wrapper .order-icon {
-    background: #f0f4f8;
-}
-
-.admin-wrapper .rating-icon {
-    background: #f5f3e8;
-}
-
-.admin-wrapper .stat-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.admin-wrapper .stat-label {
-    font-size: 12px;
-    color: #6b7280;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.admin-wrapper .stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #111827;
-    line-height: 1.1;
-}
-
-.admin-wrapper .stat-sub {
-    font-size: 12px;
-    font-weight: 500;
-}
-
-    .admin-wrapper .stat-sub.positive {
-        color: #16a34a;
-    }
-
-    .admin-wrapper .stat-sub.neutral {
-        color: #6b7280;
-    }
-
-    .admin-wrapper .stat-sub.negative {
-        color: #dc2626;
-    }
-
-/* Günlük Gəlir - daxili layout */
-.admin-wrapper .card-title-area {
-    width: 100%;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.admin-wrapper .income-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.admin-wrapper .income-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.admin-wrapper .amount-wrapper {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
-}
-
-.admin-wrapper .amount-val {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #1e293b;
-    letter-spacing: -0.5px;
-}
-
-.admin-wrapper .currency {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #94a3b8;
-    margin-top: 2px;
-}
-
-.admin-wrapper .group-label {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    margin-top: 8px;
-    padding: 3px 10px;
-    border-radius: 6px;
-    white-space: nowrap;
-}
-
-.admin-wrapper .paid .group-label {
-    color: #10b981;
-    background: #ecfdf5;
-}
-
-.admin-wrapper .active .group-label {
-    color: #f59e0b;
-    background: #fffbeb;
-}
-
-.admin-wrapper .income-divider {
-    width: 1px;
-    height: 45px;
-    background: #e2e8f0;
-    margin: 0 16px;
-    flex-shrink: 0;
-}
-
-.admin-wrapper .loading-state {
-    font-size: 0.9rem;
-    color: #94a3b8;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 /* ================================================
-   DASHBOARD - SİFARİŞLƏR CƏDVƏLİ
+   MODAL  (body-də render olduğu üçün qlobal qalır)
    ================================================ */
 
-/* Ana kartın hündürlüyünü məhdudlaşdırmırıq ki, başlıq və cədvəl rahat yerləşsin */
-.admin-wrapper .orders-card {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 24px;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #f0f0f4;
-    margin-top: 20px;
-
-    max-width: 650px;
-}
-
-/* Skrol effektini cədvəlin daxili wrapper-inə veririk */
-.admin-wrapper .table-wrapper {
-    max-height: 350px; /* Cədvəlin görünməsini istədiyiniz maksimum hündürlük */
-    overflow-y: auto; /* Sifarişlər bu hündürlüyü keçəndə skrol çıxacaq */
-}
-
-/* Cədvəl başlığının (thead) yuxarıda sabit (sticky) qalması üçün */
-.admin-wrapper .orders-table thead th {
-    position: sticky;
-    top: 0;
-    background: #ffffff; /* Başlığın arxası görünməsin deyə kartın rəngi ilə eyni edirik */
-    z-index: 1; /* Sətirlər skrol olduqda başlığın altından keçsin */
-}
-/*----------------------*/
-.admin-wrapper .card-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 20px;
-}
-
-.admin-wrapper .table-wrapper {
-    overflow-x: auto;
-}
-
-.admin-wrapper .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-    .admin-wrapper .orders-table th {
-        text-align: left;
-        padding: 12px 15px;
-        color: #636e72;
-        font-weight: 600;
-        font-size: 13px;
-        background-color: #f8f9fa;
-        border-bottom: 2px solid #edf2f7;
-        white-space: nowrap;
-    }
-
-    .admin-wrapper .orders-table td {
-        padding: 15px;
-        color: #374151;
-        border-bottom: 1px solid #edf2f7;
-        vertical-align: middle;
-    }
-
-    .admin-wrapper .orders-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .admin-wrapper .orders-table tbody tr:hover td {
-        background: #fafafa;
-    }
-
-.admin-wrapper .order-id {
-    color: var(--accent);
-    font-weight: 600;
-}
-
-/* Status Badge-lər */
-.admin-wrapper .status-badge {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    min-width: 90px;
-    text-align: center;
-}
-
-    .admin-wrapper .status-badge.preparing,
-    .admin-wrapper .status-preparing {
-        background: #fff4e5;
-        color: #ff9800;
-        border: 1px solid #ffe5b4;
-    }
-
-    .admin-wrapper .status-badge.completed,
-    .admin-wrapper .status-paid {
-        background: #e8f5e9;
-        color: #2e7d32;
-        border: 1px solid #c8e6c9;
-    }
-
-    .admin-wrapper .status-badge.waiting {
-        background: #fef9c3;
-        color: #92400e;
-    }
-
-/* Cədvəl düymələri */
-.admin-wrapper .detail-btn,
-.admin-wrapper .btn-view {
-    padding: 7px 16px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 7px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-    white-space: nowrap;
-}
-
-    .admin-wrapper .detail-btn:hover,
-    .admin-wrapper .btn-view:hover {
-        opacity: 0.85;
-    }
-
-/* Vaxt sütunu */
-.admin-wrapper .time-cell {
-    font-size: 0.9rem;
-    color: #d63031;
-    font-weight: 700;
-    white-space: nowrap;
-    background-color: #fff5f5;
-    border-right: 2px solid #fab1a0;
-    font-family: 'Courier New', Courier, monospace;
-    text-align: center;
-}
-
-    .admin-wrapper .time-cell i {
-        color: #ff7675;
-        margin-right: 4px;
-    }
-
-/* ================================================
-   MODAL
-   ================================================ */
-
-.admin-wrapper .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    backdrop-filter: blur(4px);
-}
-
-.admin-wrapper .modal-content {
-    background-color: #ffffff;
-    width: 90%;
-    max-width: 700px;
-    max-height: 90vh;
-    border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: modalAppear 0.3s ease-out;
-}
-
-.admin-wrapper .modal-header {
-    padding: 20px 25px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-    .admin-wrapper .modal-header h3 {
-        margin: 0;
-        font-size: 1.25rem;
-        color: #2d3436;
-        font-weight: 700;
-    }
-
-.admin-wrapper .close-btn {
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #b2bec3;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-    .admin-wrapper .close-btn:hover {
-        color: #d63031;
-    }
-
-.admin-wrapper .modal-body {
-    padding: 25px;
-    overflow-y: auto;
-}
-
-.admin-wrapper .modal-footer {
-    padding: 20px 25px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.admin-wrapper .total-amount {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #2d3436;
-}
-
-.admin-wrapper .btn-close-modal {
-    background-color: var(--accent);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-    .admin-wrapper .btn-close-modal:hover {
-        opacity: 0.85;
-    }
-
-@keyframes modalAppear {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-/*-----------------------------------------*/
-/* Yeni gələn sətir üçün parıltı effekti */
-@keyframes fade-in-yellow {
-    0% {
-        background-color: rgba(255, 243, 205, 1);
-    }
-    /* Canlı sarı */
-    100% {
-        background-color: transparent;
-    }
-    /* Normallaşma */
-}
-
-.new-order-highlight {
-    animation: fade-in-yellow 3s ease-out; /* 3 saniyə ərzində yavaşca itsin */
-}
-
-
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-/*--------------------------------------------------------*/
-
-/* ==========================================================================
-   1. DASHBOARD & FINANCE CARD (Admin-wrapper daxilində və ya kənarında)
-   ========================================================================== */
-.dashboard .finance-action-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 20px 24px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    align-self: flex-start;
-}
-
-    .dashboard .finance-action-card .card-title {
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        color: #1e293b;
-        margin: 0;
-    }
-
-    .dashboard .finance-action-card .add-btn {
-        background: #6366f1;
-        color: #ffffff;
-        border: none;
-        border-radius: 6px;
-        padding: 8px 16px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s, transform 0.1s;
-        white-space: nowrap;
-    }
-
-        .dashboard .finance-action-card .add-btn:hover {
-            background: #4f46e5;
-        }
-
-        .dashboard .finance-action-card .add-btn:active {
-            transform: scale(0.98);
-        }
-
-/* ==========================================================================
-   2. TOAST NOTIFICATION (HTML-də tam müstəqil kənarda dayandığı üçün)
-   ========================================================================== */
-.toast-notification {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: #ffffff;
-    border-left: 4px solid #10b981; /* Uğurlu yaşıl rəng */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 9999; /* Həmişə ən üstdə */
-    animation: slideIn 0.3s ease-out forwards;
-}
-
-.toast-icon {
-    background: #ecfdf5;
-    color: #10b981;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.toast-body {
-    display: flex;
-    flex-direction: column;
-}
-
-.toast-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.toast-desc {
-    font-size: 12px;
-    color: #64748b;
-}
-
-/* Silinmə / Təhlükə bildirişi fərqləndirməsi */
-.toast-notification.toast-danger {
-    border-left: 4px solid #ef4444;
-}
-
-    .toast-notification.toast-danger .toast-icon {
-        background: #fef2f2;
-        color: #ef4444;
-    }
-
-/* ==========================================================================
-   3. ÜMUMİ MODAL STRUCTUR (Həm Sifariş, həm Xərc modalına birbaşa təsir edir)
-   ========================================================================== */
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -983,6 +292,10 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: hidden;
     animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.expanded-modal {
+    max-width: 650px !important;
 }
 
 .modal-header {
@@ -1024,7 +337,49 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow-y: auto;
 }
+
+    .modal-body .form-area {
+        margin-top: 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+    }
+
+.form-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+    .form-input:focus {
+        border-color: #6366f1;
+    }
+
+.submit-btn {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+    .submit-btn:hover {
+        background: #4f46e5;
+    }
 
 .modal-footer {
     padding: 14px 20px;
@@ -1039,28 +394,49 @@
 .total-section {
     font-weight: 700;
     color: #1e293b;
-    margin-right: auto; /* Qiyməti sola sıxır, düyməni sağda saxlayır */
+    margin-right: auto;
 }
 
-/* Genişləndirilmiş modal (Xərc cədvəli üçün) */
-.expanded-modal {
-    max-width: 650px !important;
+/* Xərc cədvəli */
+.expense-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
 }
 
-.modal-body .form-area {
-    margin-top: 16px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    padding: 12px;
-    display: flex;
-    gap: 10px;
-}
+    .expense-table th {
+        text-align: left;
+        padding: 10px 12px;
+        color: #636e72;
+        font-weight: 600;
+        font-size: 13px;
+        background: #f8f9fa;
+        border-bottom: 2px solid #edf2f7;
+        white-space: nowrap;
+    }
 
-/* Xərc düyməsi və silmə stilləri */
+    .expense-table td {
+        padding: 12px;
+        color: #374151;
+        border-bottom: 1px solid #edf2f7;
+        vertical-align: middle;
+    }
+
+    .expense-table .amt {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .expense-table .time-col {
+        font-size: 12px;
+        color: #94a3b8;
+        white-space: nowrap;
+    }
+
 .delete-expense-btn {
-    background: none !important;
-    border: none !important;
-    color: #ef4444 !important;
+    background: none;
+    border: none;
+    color: #ef4444;
     font-size: 1.25rem;
     font-weight: bold;
     cursor: pointer;
@@ -1070,12 +446,71 @@
 }
 
     .delete-expense-btn:hover {
-        color: #b91c1c !important;
+        color: #b91c1c;
     }
 
-/* ==========================================================================
-   4. ANİMASİYALAR
-   ========================================================================== */
+/* ================================================
+   TOAST  (body-də render olduğu üçün qlobal qalır)
+   ================================================ */
+
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #ffffff;
+    border-left: 4px solid #10b981;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+.toast-icon {
+    background: #ecfdf5;
+    color: #10b981;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.toast-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.toast-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.toast-desc {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.toast-notification.toast-danger {
+    border-left: 4px solid #ef4444;
+}
+
+    .toast-notification.toast-danger .toast-icon {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+
+/* ================================================
+   ANİMASİYALAR
+   ================================================ */
+
 @keyframes slideIn {
     from {
         transform: translateX(100%);
@@ -1107,5 +542,17 @@
     to {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

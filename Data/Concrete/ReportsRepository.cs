@@ -41,5 +41,21 @@ namespace Data.Concrete
             // Dapper parametr olaraq DateTime-ı özü düzgün formata salacaq
             return await _connection.QueryFirstOrDefaultAsync<dynamic>(sql, new { StartDate = startDate, EndDate = endDate }, _transaction);
         }
+        public async Task<IEnumerable<dynamic>> GetTopSellingProductsAsync(DateTime startDate, DateTime endDate, int? categoryId)
+        {
+            var sql = @"SELECT 
+                p.Name AS ProductName,
+                SUM(oi.Quantity) AS SalesCount,
+                SUM(oi.Quantity * oi.UnitPrice) AS TotalRevenue
+            FROM OrderItems oi
+            INNER JOIN Products p ON oi.ProductId = p.Id
+            INNER JOIN Orders o ON oi.OrderId = o.Id
+            WHERE o.OrderDate >= @StartDate 
+              AND o.OrderDate <= @EndDate
+              AND (@CategoryId IS NULL OR p.CategoryId = @CategoryId)
+            GROUP BY p.Id, p.Name
+            ORDER BY SalesCount DESC;";
+            return await _connection.QueryAsync<dynamic>(sql, new { StartDate = startDate, EndDate = endDate, CategoryId = categoryId }, _transaction);
+        }
     }
 }

@@ -107,64 +107,117 @@
         </div>
     </div>
 
-    <!-- Statistika Kartları -->
+    <div class="dashboard-tables-grid">
+        <!-- Son Sifarişlər Cədvəli -->
+        <div class="orders-card">
+            <h3 class="card-title">Son Sifarişlər Cədvəli</h3>
 
-    <!-- Son Sifarişlər Cədvəli -->
-    <div class="orders-card">
-        <h3 class="card-title">Son Sifarişlər Cədvəli</h3>
-
-        <div class="table-wrapper">
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th>Masa</th>
-                        <th>Sifariş №</th>
-                        <th>Saat</th>
-                        <th>Cəmi</th>
-                        <th>Status</th>
-                        <th>Əməliyyat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (orders == null)
-                    {
+            <div class="table-wrapper">
+                <table class="orders-table">
+                    <thead>
                         <tr>
-                            <td colspan="6" style="text-align:center;">Məlumatlar yüklənir...</td>
+                            <th>Masa</th>
+                            <th>Sifariş №</th>
+                            <th>Saat</th>
+                            <th>Cəmi</th>
+                            <th>Status</th>
+                            <th>Əməliyyat</th>
                         </tr>
-                    }
-                    else if (!orders.Any())
-                    {
-                        <tr>
-                            <td colspan="6" style="text-align:center;">Bu gün üçün hələ ki sifariş yoxdur.</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var order in orders)
+                    </thead>
+                    <tbody>
+                        @if (orders == null)
                         {
                             <tr>
-                                <td>@order.TableNumber</td>
-                                <td>#@order.Id</td>
-                                <td>@order.OrderDate.ToString("HH:mm")</td> @* Saat:Dəqiqə formatı *@
-                                <td>@order.TotalAmount AZN</td>
-                                <td>
-                                    @* Statusa görə fərqli CSS class-ları veririk *@
-                                    <span class="status-badge @GetStatusClass(order.Status)">
-                                        @GetStatusText(order.Status)
-                                    </span>
-                                </td>
-                                <td>
-                                    <button class="btn-view" @onclick="() => ViewOrderDetails(order.Id)">
-                                        Bax
-                                    </button>
-                                </td>
+                                <td colspan="6" style="text-align:center;">Məlumatlar yüklənir...</td>
                             </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                        else if (!orders.Any())
+                        {
+                            <tr>
+                                <td colspan="6" style="text-align:center;">Bu gün üçün hələ ki sifariş yoxdur.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var order in orders)
+                            {
+                                <tr>
+                                    <td>@order.TableNumber</td>
+                                    <td>#@order.Id</td>
+                                    <td>@order.OrderDate.ToString("HH:mm")</td> @* Saat:Dəqiqə formatı *@
+                                    <td>@order.TotalAmount AZN</td>
+                                    <td>
+                                        @* Statusa görə fərqli CSS class-ları veririk *@
+                                        <span class="status-badge @GetStatusClass(order.Status)">
+                                            @GetStatusText(order.Status)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn-view" @onclick="() => ViewOrderDetails(order.Id)">
+                                            Bax
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="top-products-card">
+            <div class="card-header-area">
+                <h3 class="card-title">Məhsul Satış Analizi</h3>
+
+                <div class="category-tabs">
+                    <button class="tab-btn active">Hamısı</button>
+                    <button class="tab-btn">Soyuq İçkilər</button>
+                    <button class="tab-btn">Yeməklər</button>
+                    <button class="tab-btn">Isti İçkilər</button>
+                    <button class="tab-btn">Desertlər</button>
+                </div>
+            </div>
+
+            <div class="products-list-wrapper">
+                <table class="top-products-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">Sıra</th>
+                            <th>Məhsul Adı</th>
+                            <th style="text-align: center;">Satış Sayı</th>
+                            <th style="text-align: right;">Ümumi Qazanc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rank-cell"><span class="rank-badge gold">1</span></td>
+                            <td class="product-name">Coca-Cola 330ml</td>
+                            <td class="sales-count">42 ədəd</td>
+                            <td class="total-revenue">105.00 AZN</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-cell"><span class="rank-badge silver">2</span></td>
+                            <td class="product-name">Sezar Salatı</td>
+                            <td class="sales-count">28 ədəd</td>
+                            <td class="total-revenue">336.00 AZN</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-cell"><span class="rank-badge bronze">3</span></td>
+                            <td class="product-name">Ayran 200ml</td>
+                            <td class="sales-count">25 ədəd</td>
+                            <td class="total-revenue">37.50 AZN</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-cell"><span class="rank-badge normal">4</span></td>
+                            <td class="product-name">Ispanaq Şorbası</td>
+                            <td class="sales-count">19 ədəd</td>
+                            <td class="total-revenue">114.00 AZN</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
 </div>
 
 @* _____________MODALS______________ *@
