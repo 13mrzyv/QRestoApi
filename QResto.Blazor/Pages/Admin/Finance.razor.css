@@ -141,15 +141,54 @@
     overflow: hidden;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
-
-.panel-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid #f1f5f9;
+/*---------------------------------------*/
+/* ── YENİ SƏLİQƏLİ DÜZBUCAQLI MALİYYƏ KARTI ── */
+.finance-action-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* Böyük boşluğun qarşısını almaq və digər elementlərlə eyni xətdə durmaq üçün */
+    width: 100%;
+    align-self: flex-start; /* Hündürlüyünün lazımsız uzanmasının qarşısını alır */
 }
 
+    /* Kartın daxilindəki Başlıq */
+    .finance-action-card .card-title {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    /* Xərc Əlavə Et Düyməsi (Sənin tətbiq etdiyin bənövşəyi/indigo tonu ilə) */
+    .finance-action-card .add-btn {
+        background: #6366f1;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        white-space: nowrap; /* Düymə mətninin iki sətirə bölünməməsi üçün */
+    }
+
+        .finance-action-card .add-btn:hover {
+            background: #4f46e5;
+        }
+
+        .finance-action-card .add-btn:active {
+            transform: scale(0.98);
+        }
+/*----------------------------------------*/
 .panel-title {
     font-size: 14px;
     font-weight: 700;
@@ -175,6 +214,13 @@
         background: #4f46e5;
     }
 
+/* ── 📌 CƏDVƏLİ TUTAN SCROLL KONTEYNERİ ── */
+.table-wrapper {
+    max-height: 280px; /* İstədiyin hündürlük limitini bura yaza bilərsən */
+    overflow-y: auto; /* Sətirlər limiti keçəndə şaquli scroll aktivləşir */
+    overflow-x: hidden; /* Üfüqi istiqamətdə lazımsız sürüşmələrin qarşısını alır */
+}
+
 /* ── XƏRCLƏR CƏDVƏLİ ── */
 .expense-table {
     width: 100%;
@@ -183,14 +229,17 @@
 }
 
     .expense-table th {
+        position: sticky; /* Scroll edəndə başlıqların yuxarıda yapışıb qalması üçün */
+        top: 0;
+        z-index: 1; /* Sətirlərin başlıqların altından keçməsi üçün */
+        background: #f8fafc; /* Şəffaflığın qarşısını almaq üçün mütləq arxa fon rəngi */
+        box-shadow: inset 0 -1px 0 #e2e8f0; /* Border-bottom funksiyasını scroll zamanı qoruyur */
         text-align: left;
         padding: 12px 20px;
         color: #64748b;
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 0.5px;
-        border-bottom: 1px solid #e2e8f0;
-        background: #f8fafc; /* Sənin cədvəlin üst hissəsi kimi açıq boz */
     }
 
     .expense-table td {
@@ -403,3 +452,352 @@
     white-space: nowrap;
     font-weight: 500;
 }
+/*______________________________________________________________*/
+/* ── TOAST NOTIFICATION ── */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #ffffff;
+    border-left: 4px solid #10b981; /* Uğurlu yaşıl rəng */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999; /* Həmişə hər şeyin üstündə görünsün */
+    /* Giriş animasiyası */
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+.toast-icon {
+    background: #ecfdf5;
+    color: #10b981;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.toast-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.toast-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.toast-desc {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ── MÖVCUD TOAST KODLARINIZA ƏLAVƏLƏR ── */
+
+ Əgər silinmə bildirişidirsə, sol xətti qırmızı et 
+.toast-notification.toast-danger {
+    border-left: 4px solid #ef4444;  
+}
+
+     Silinmə bildirişinin ikona dairəsini qırmızı et 
+    .toast-notification.toast-danger .toast-icon {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+
+/* ── ANİMASİYA KODU ── */
+/* Sizin CSS-də @keyframes yox idisə, bunu mütləq əlavə edin */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+
+/* ── MODAL BACKDROP (Arxa qara şəffaf fon) ── */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6); /* Slate 900 rənginin şəffaf versiyası */
+    backdrop-filter: blur(4px); /* Arxa fonu zərif bulandırmaq üçün */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Hər şeyin ən üstündə durması üçün */
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* ── MODAL PƏNCƏRƏSİ ── */
+.modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── MODAL DAXİLİ HİSSƏLƏR ── */
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+    .modal-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+    .close-btn:hover {
+        color: #475569;
+    }
+
+.modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .modal-form-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+.modal-footer {
+    padding: 14px 20px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ── MODAL DÜYMƏLƏRİ ── */
+.cancel-btn {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .cancel-btn:hover {
+        background: #f1f5f9;
+    }
+
+/* ── ANİMASİYALAR ── */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Həm cədvəl həm form yerləşsin deyə modalı bir az geniş edirik */
+.expanded-modal {
+    max-width: 650px !important;
+}
+
+/* Modal daxilindəki formun kənarlarını səliqəyə salmaq üçün */
+.modal-body .form-area {
+    margin-top: 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+/*----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------*/
+.delete-expense-btn {
+    background: none !important;
+    border: none !important;
+    color: #ef4444 !important; /* Müvəqqəti olaraq bunu yoxlayın */
+    font-size: 1.25rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+    .delete-expense-btn:hover {
+        color: #b91c1c !important;
+    }
+/*----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------*/
+
+/* ================================================
+   DASHBOARD - FİLTR VƏ TARİX SEÇİMİ
+================================================ */
+
+.filter-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 1px;
+}
+
+.date-picker-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    background: #ffffff;
+    padding: 8px 15px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.date-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.date-display-wrapper {
+    position: relative;
+    width: 145px;
+    height: 38px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.real-date-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 10;
+    cursor: pointer;
+}
+
+    .real-date-input::-webkit-calendar-picker-indicator {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+    }
+
+.fake-date-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 13px;
+    color: #334155;
+    z-index: 5;
+    pointer-events: none;
+}
+
+    .fake-date-input::after {
+        content: '\f133';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 10px;
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+.filter-ok-btn {
+    height: 38px;
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+    .filter-ok-btn:hover {
+        background-color: #4f52d9;
+    }

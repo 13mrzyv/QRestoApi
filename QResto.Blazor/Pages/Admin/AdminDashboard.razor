@@ -1,18 +1,80 @@
-﻿@* @page "/" *@
+﻿@page "/"
 @page "/admin/admindashboard"
 @using Microsoft.AspNetCore.SignalR.Client
 @using QResto.Blazor.Services
+@using QResto.Shared.DTOs.Requests
 @using QResto.Shared.DTOs.Responses
 @inject OrderService orderService
 @layout QResto.Blazor.Layouts.AdminLayout
 @inject NavigationManager NavManager
+@inject FinanceService financeService
 
 
 
 <div class="dashboard">
 
     <div class="dashboard-header">
-        <h2 class="dashboard-title">İdarə Paneli Baxışı</h2>
+        <div class="stats-grid">
+
+            <div class="stat-card daily-income-card">
+                <div class="card-title-area">
+                    <span class="stat-label">Günlük Gəlir Analizi</span>
+                </div>
+
+                <div class="income-content">
+                    @if (totalSales == null)
+                    {
+                        <div class="loading-state">
+                            <i class="fas fa-circle-notch fa-spin"></i> Yüklənir...
+                        </div>
+                    }
+                    else
+                    {
+                        @* Ödənilmiş Hissəsi *@
+                        <div class="income-group paid">
+                            <div class="amount-wrapper">
+                                <span class="amount-val">@totalSales.CompletedTotal.ToString("N2")</span>
+                                <span class="currency">AZN</span>
+                            </div>
+                            <span class="group-label">ÖDƏNİLMİŞ</span>
+                        </div>
+
+                        <div class="income-divider"></div>
+
+                        @* Aktiv Masa Hissəsi *@
+                        <div class="income-group active">
+                            <div class="amount-wrapper">
+                                <span class="amount-val">@totalSales.ActiveTotal.ToString("N2")</span>
+                                <span class="currency">AZN</span>
+                            </div>
+                            <span class="group-label">AKTİV MASA</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="stats-column">
+                <div class="stat-card" @onclick='() => NavManager.NavigateTo($"/waiter/waiterdashboard/{UserName}")' style="cursor:pointer;">
+                    <div class="stat-icon table-icon">🍽</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Masalar Ve Menyu</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon order-icon">👨‍🍳</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Aktiv Masalar</span>
+                        <span class="stat-value">@numberOfActiveOrders</span>
+                        @* <span class="stat-sub neutral">Mətbəx</span> *@
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        @* <h2 class="dashboard-title">İdarə Paneli Baxışı</h2> *@
         <div class="filter-wrapper">
             <div class="date-picker-container">
                 <div class="date-input-group">
@@ -35,67 +97,17 @@
                     <i class="fas fa-check"></i> OK
                 </button>
             </div>
+
+            <div class="finance-action-card">
+                <h4 class="card-title">Gündəlik Maliyyə Hesabatı</h4>
+                <button class="add-btn" @onclick="OpenExpenseModal">
+                    &#43; Xərc Əlavə Et
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Statistika Kartları -->
-    <div class="stats-grid">
-
-        <div class="stat-card daily-income-card">
-            <div class="card-title-area">
-                <span class="stat-label">Günlük Gəlir Analizi</span>
-            </div>
-
-            <div class="income-content">
-                @if (totalSales == null)
-                {
-                    <div class="loading-state">
-                        <i class="fas fa-circle-notch fa-spin"></i> Yüklənir...
-                    </div>
-                }
-                else
-                {
-                    @* Ödənilmiş Hissəsi *@
-                    <div class="income-group paid">
-                        <div class="amount-wrapper">
-                            <span class="amount-val">@totalSales.CompletedTotal.ToString("N2")</span>
-                            <span class="currency">AZN</span>
-                        </div>
-                        <span class="group-label">ÖDƏNİLMİŞ</span>
-                    </div>
-
-                    <div class="income-divider"></div>
-
-                    @* Aktiv Masa Hissəsi *@
-                    <div class="income-group active">
-                        <div class="amount-wrapper">
-                            <span class="amount-val">@totalSales.ActiveTotal.ToString("N2")</span>
-                            <span class="currency">AZN</span>
-                        </div>
-                        <span class="group-label">AKTİV MASA</span>
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="stats-column">
-            <div class="stat-card" @onclick='() => NavManager.NavigateTo($"/waiter/waiterdashboard/{UserName}")' style="cursor:pointer;">
-                <div class="stat-icon table-icon">🍽</div>
-                <div class="stat-info">
-                    <span class="stat-label">Masalar Ve Menyu</span>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon order-icon">👨‍🍳</div>
-                <div class="stat-info">
-                    <span class="stat-label">Aktiv Masalar</span>
-                    <span class="stat-value">@numberOfActiveOrders</span>
-                    @* <span class="stat-sub neutral">Mətbəx</span> *@
-                </div>
-            </div>
-        </div>
-
-    </div>
 
     <!-- Son Sifarişlər Cədvəli -->
     <div class="orders-card">
@@ -153,69 +165,155 @@
             </table>
         </div>
     </div>
+</div>
 
-    @* _____________MODALS______________ *@
-    @if (isOrderModalOpen && orderDetail != null)
-    {
-        <div class="admin-wrapper">
-            <div class="modal-backdrop" @onclick="CloseModal">
-                <div class="modal-content" @onclick:stopPropagation="true">
+@* _____________MODALS______________ *@
+@if (isOrderModalOpen && orderDetail != null)
+{
+    <div class="admin-wrapper">
+        <div class="modal-backdrop" @onclick="CloseModal">
+            <div class="modal-content" @onclick:stopPropagation="true">
 
-                    <div class="modal-header">
-                        <div>
-                            <h3>Sifariş #@orderDetail.OrderId (Masa @orderDetail.TableNumber)</h3>
-                            @* Items siyahısındakı ilk məhsulun tarixini götürürük *@
-                            <p class="modal-subtitle">
-                                <i class="fa fa-clock"></i>
-                                @(orderDetail.Items.FirstOrDefault()?.OrderDate.ToString("dd.MM.yyyy HH:mm") ?? "-")
-                            </p>
-                        </div>
-                        <button class="close-btn" @onclick="CloseModal">&times;</button>
+                <div class="modal-header">
+                    <div>
+                        <h3>Sifariş #@orderDetail.OrderId (Masa @orderDetail.TableNumber)</h3>
+                        @* Items siyahısındakı ilk məhsulun tarixini götürürük *@
+                        <p class="modal-subtitle">
+                            <i class="fa fa-clock"></i>
+                            @(orderDetail.Items.FirstOrDefault()?.OrderDate.ToString("dd.MM.yyyy HH:mm") ?? "-")
+                        </p>
                     </div>
+                    <button class="close-btn" @onclick="CloseModal">&times;</button>
+                </div>
 
-                    <div class="modal-body">
-                        <table class="orders-table">
-                            <thead>
+                <div class="modal-body">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Saat</th> @* Yeni Sütun *@
+                                <th>Məhsul</th>
+                                <th>Say</th>
+                                <th>Qiymət</th>
+                                <th>Qeyd</th>
+                                <th>Cəmi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in orderDetail.Items)
+                            {
                                 <tr>
-                                    <th>Saat</th> @* Yeni Sütun *@
-                                    <th>Məhsul</th>
-                                    <th>Say</th>
-                                    <th>Qiymət</th>
-                                    <th>Qeyd</th>
-                                    <th>Cəmi</th>
+                                    <td class="time-cell">
+                                        <i class="fa fa-clock-o" style="font-size: 0.8rem; color: #999;"></i>
+                                        @item.OrderDate.ToString("HH:mm")
+                                    </td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.UnitPrice.ToString("N2") AZN</td>
+                                    <td><small>@(item.Note ?? "-")</small></td>
+                                    <td>@((item.UnitPrice * item.Quantity).ToString("N2")) AZN</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in orderDetail.Items)
-                                {
-                                    <tr>
-                                        <td class="time-cell">
-                                            <i class="fa fa-clock-o" style="font-size: 0.8rem; color: #999;"></i>
-                                            @item.OrderDate.ToString("HH:mm")
-                                        </td>
-                                        <td>@item.ProductName</td>
-                                        <td>@item.Quantity</td>
-                                        <td>@item.UnitPrice.ToString("N2") AZN</td>
-                                        <td><small>@(item.Note ?? "-")</small></td>
-                                        <td>@((item.UnitPrice * item.Quantity).ToString("N2")) AZN</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div class="modal-footer">
-                        <div class="total-section">
-                            Ümumi: @orderDetail.TotalAmount.ToString("N2") AZN
-                        </div>
-                        <button class="btn-view" @onclick="CloseModal">Bağla</button>
+                <div class="modal-footer">
+                    <div class="total-section">
+                        Ümumi: @orderDetail.TotalAmount.ToString("N2") AZN
                     </div>
+                    <button class="btn-view" @onclick="CloseModal">Bağla</button>
                 </div>
             </div>
         </div>
-    }
+    </div>
+}
 
-</div>
+@if (isExpenseModalOpen)
+{
+    <div class="modal-backdrop" @onclick="CloseExpenseModal">
+        <div class="modal-content expanded-modal" @onclick:stopPropagation>
+
+            <div class="modal-header">
+                <h3>Bugünkü Xərclərin İdarə Edilməsi</h3>
+                <button class="close-btn" @onclick="CloseExpenseModal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="table-wrapper">
+                    <table class="expense-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px; text-align: center;">Sil</th>
+                                <th>Açıqlama</th>
+                                <th>Məbləğ</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (todayExpenses != null && todayExpenses.Any())
+                            {
+                                @foreach (var item in todayExpenses)
+                                {
+                                    <tr>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <button class="delete-expense-btn"
+                                                    @onclick="() => HandleDeleteExpense(item.Id)"
+                                                    title="Sil">
+                                                &times;
+                                            </button>
+                                        </td>
+                                        <td>@item.Description</td>
+                                        <td class="amt">@item.Amount.ToString("N2") AZN</td>
+                                        <td class="time-col">@item.ExpenseDate.ToString("HH:mm")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: #94a3b8; padding: 20px;">
+                                        Bugün üçün hələ ki heç bir xərc daxil edilməyib.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="form-area">
+                    <input type="text"
+                           class="form-input"
+                           placeholder="Açıqlama:"
+                           @bind="expenseDescription"
+                           @bind:event="oninput" />
+
+                    <input type="number"
+                           class="form-input"
+                           placeholder="Məbləğ"
+                           @bind="expenseAmount"
+                           @bind:event="oninput" />
+
+                    <button class="submit-btn" @onclick="HandleAddExpense">
+                        Əlavə Et
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@if (showToast)
+{
+    <div class="toast-notification @(toastType == "danger" ? "toast-danger" : "")">
+        <span class="toast-icon">@(toastType == "danger" ? "✕" : "✓")</span>
+        <div class="toast-body">
+            <span class="toast-title">@toastTitle</span>
+            <span class="toast-desc">@toastDesc</span>
+        </div>
+    </div>
+}
 
 @code {
     [Parameter] public string UserName { get; set; }
@@ -228,6 +326,22 @@
     private DateTime startDate = DateTime.Now;
     private DateTime endDate = DateTime.Now;
     private HubConnection? hubConnection;
+
+    // Finance
+
+    private bool showToast = false;
+    private string toastType = "success"; // "success" və ya "danger"
+    private string toastTitle = "";
+    private string toastDesc = "";
+
+    private string expenseDescription = "";
+    private decimal expenseAmount = 0;
+
+    private List<ExpenseResponse>? todayExpenses;
+
+    private bool isExpenseModalOpen = false;
+
+    //Finance
 
 
     private async Task ViewOrderDetails(int orderId)
@@ -305,4 +419,121 @@
 
 
     private record OrderRow(string Table, string OrderId, string Customer, int Total, string Status);
+
+    // Finance
+    // Finance
+    // Finance
+
+    private async Task OpenExpenseModal()
+    {
+        isExpenseModalOpen = true;
+        // Modal açılanda ən son xərcləri backend-dən çəkirik
+        await LoadTodayExpenses();
+    }
+    private void CloseExpenseModal()
+    {
+        isExpenseModalOpen = false;
+    }
+
+    private async Task HandleAddSuccess()
+    {
+        toastType = "success";
+        toastTitle = "Uğurlu!";
+        toastDesc = "Xərc uğurla qeydə alındı.";
+        await TriggerToast();
+    }
+
+    // Xərc silinəndə çağırılacaq metod
+    private async Task HandleDeleteSuccess()
+    {
+        toastType = "danger";
+        toastTitle = "Silindi!";
+        toastDesc = "Xərc siyahıdan silindi.";
+        await TriggerToast();
+    }
+
+    private async Task TriggerToast()
+    {
+        showToast = true;
+        StateHasChanged(); // Blazor-a ekranı yeniləməsini deyirik
+
+        // 3 saniyə (3000 millisaniyə) gözləyirik
+        await Task.Delay(3000);
+
+        showToast = false;
+        StateHasChanged(); // Bildirişi ekrandan silirik
+    }
+
+    private async Task LoadTodayExpenses()
+    {
+        try
+        {
+            // Endpoint yolunu öz layihəndəki API strukturuna görə tənzimləyə bilərsən
+            var result = await financeService.GetTodayExpensesAsync();
+            if (result != null)
+            {
+                todayExpenses = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Xəta baş verərsə konsola yazdırırıq, real layihədə bir bildiriş mexanizmi qura bilərik
+            Console.WriteLine($"Xərc yüklənərkən xəta: {ex.Message}");
+        }
+    }
+
+    private async Task HandleDeleteExpense(int id)
+    {
+        // API-ə DELETE sorğusunun göndərilməsi
+        // var response = await Http.DeleteAsync($"api/expenses/{id
+        var response = await financeService.DeleteExpenseAsync(id);
+
+        if (response)
+        {
+            // Silinmə uğurlu olarsa, siyahını lokal olaraq yeniləyirik
+            var itemToRemove = todayExpenses.FirstOrDefault(e => e.Id == id);
+            if (itemToRemove != null)
+            {
+                todayExpenses.Remove(itemToRemove);
+                StateHasChanged(); // Komponenti yenidən render etmək üçün
+            }
+        }
+        else
+        {
+            // Xəta baş verərsə konsola yazdır və ya istifadəçiyə bildir
+            Console.WriteLine("Xərc silinərkən xəta baş verdi.");
+        }
+
+        await HandleDeleteSuccess();
+    }
+
+
+    private async Task HandleAddExpense()
+    {
+        // Dəyişənlərin boş olub-olmadığını yoxlayırıq
+        if (string.IsNullOrWhiteSpace(expenseDescription) || expenseAmount <= 0)
+            return;
+
+        // Request modelimizi qururuq (Biz bazada və DTO-da 'Title' qoymuşduq)
+        var dto = new CreateExpenseRequest
+        {
+            Description = expenseDescription,
+            Amount = expenseAmount
+        };
+
+        // Servisə tək parametr yox, bütöv DTO obyektini göndəririk
+        await financeService.AddExpenseAsync(dto);
+
+        // Formu sıfırlayırıq
+        expenseDescription = "";
+        expenseAmount = 0;
+
+        // Siyahını anında yeniləyirik
+        await LoadTodayExpenses();
+
+        await HandleAddSuccess();
+    }
+    // Finance
+    // Finance
+    // Finance
 }

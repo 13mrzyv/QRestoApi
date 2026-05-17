@@ -14,6 +14,8 @@ builder.Services.AddScoped<OrderEntryService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<UserProvider>();
+builder.Services.AddScoped<FinanceService>();
+
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7001/") });
 

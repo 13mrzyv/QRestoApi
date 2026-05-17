@@ -24,5 +24,21 @@ namespace QRestoApi.Controllers
             }
             return Ok("Xərc uğurla əlavə edildi.");
         }
+        [HttpGet]
+        public async Task<IActionResult> GetExpensesOfToday()
+        {
+            var expenses = await _expenseService.GetExpensesOfTodayAsync();
+            return Ok(expenses);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteExpenseById(int id)
+        {
+            var result = await _expenseService.DeleteExpenseByIdAsync(id);
+            if (!result)
+            {
+                return BadRequest("Xərc silinərkən bir xəta baş verdi.");
+            }
+            return Ok("Xərc uğurla silindi.");
+        }
     }
 }

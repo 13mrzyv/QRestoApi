@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Abstract;
 using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Data.Abstract;
 using Entity;
 using System;
@@ -28,6 +29,25 @@ namespace Business.Concrete
                 var result = await _unitOfWork.ExpensesRepository.AddExpenseAsync(expense);
                 _unitOfWork.Commit(); // Əgər transaction istifadə edirsənsə mütləq commit et
                 return result > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<IEnumerable<ExpenseResponse>> GetExpensesOfTodayAsync()
+        {
+            var results = await _unitOfWork.ExpensesRepository.GetExpensesOfTodayAsync();
+            var expenses = _mapper.Map<IEnumerable<ExpenseResponse>>(results);
+            return expenses;
+        }
+        public async Task<bool> DeleteExpenseByIdAsync(int id)
+        {
+            try
+            {
+                var result = await _unitOfWork.ExpensesRepository.DeleteExpenseByIdAsync(id);
+                _unitOfWork.Commit(); // Əgər transaction istifadə edirsənsə mütləq commit et
+                return result;
             }
             catch
             {

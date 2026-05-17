@@ -19,6 +19,7 @@ namespace Business.Mapper
             CreateMap<Product, ProductResponse>();
             CreateMap<OrderWithTableNumber, OrderSummaryResponse>();
             CreateMap<CreateExpenseRequest, Expense>();
+            CreateMap<Expense, ExpenseResponse>();
             // Gələcəkdə digər mapping-lər də bura gələcək:
             // CreateMap<Category, CategoryDto>();
         }
