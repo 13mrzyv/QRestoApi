@@ -372,6 +372,24 @@
         }
 
 /* ================================================
+   CƏDVƏL GRİD — yan-yana, eyni hündürlük
+   ================================================ */
+
+.dashboard-tables-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+    margin-top: 20px;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-tables-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================================
    SİFARİŞLƏR CƏDVƏLİ
    ================================================ */
 
@@ -381,8 +399,8 @@
     padding: 24px;
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
     border: 1px solid #f0f0f4;
-    /*    margin-top: 20px;*/
-    max-width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-title {
@@ -390,13 +408,33 @@
     font-weight: 700;
     color: #111827;
     margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .table-wrapper {
-    max-height: 350px;
+    max-height: 420px;
     overflow-y: auto;
     overflow-x: auto;
 }
+
+    .table-wrapper::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
 
 .orders-table {
     width: 100%;
@@ -515,26 +553,29 @@
 .new-order-highlight {
     animation: fade-in-yellow 3s ease-out;
 }
-/*_______________________________________________*/
 
-/* ── ƏN ÇOX SATILAN MƏHSULLAR PANELİ ── */
+/* ================================================
+   TOP PRODUCTS CƏDVƏLİ
+   ================================================ */
+
 .top-products-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
     padding: 24px;
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
-    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-    /* Header və Başlıq */
     .top-products-card .card-header-area {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
         border-bottom: 1px solid #f1f5f9;
         padding-bottom: 16px;
         margin-bottom: 16px;
+        flex-shrink: 0;
     }
 
     .top-products-card .card-title {
@@ -544,23 +585,34 @@
         margin: 0;
     }
 
-    /* Kateqoriya Düymələri (Tabs) */
+    /* Kateqoriya tabları */
     .top-products-card .category-tabs {
         display: flex;
         gap: 8px;
-        overflow-x: auto; /* Çox kateqoriya olduqda sağa sürüşsün */
-        padding-bottom: 4px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 6px;
+        flex-shrink: 0;
+        max-width: 450px;
     }
 
-        /* Sürüşdürmə çubuğunu (scrollbar) gizlətmək və ya zərif etmək üçün */
         .top-products-card .category-tabs::-webkit-scrollbar {
             height: 4px;
+        }
+
+        .top-products-card .category-tabs::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
         }
 
         .top-products-card .category-tabs::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
+
+            .top-products-card .category-tabs::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
 
     .top-products-card .tab-btn {
         background: #f8fafc;
@@ -571,7 +623,7 @@
         font-size: 12px;
         font-weight: 600;
         cursor: pointer;
-        white-space: nowrap;
+        flex-shrink: 0;
         transition: all 0.2s ease;
     }
 
@@ -581,23 +633,47 @@
         }
 
         .top-products-card .tab-btn.active {
-            background: #6366f1; /* Sizin tətbiq etdiyiniz bənövşəyi/indigo tonu */
+            background: #6366f1;
             border-color: #6366f1;
             color: #ffffff;
         }
 
-    /* Cədvəl Strukturu */
+    /* Məhsul cədvəli skrol wrapper */
     .top-products-card .products-list-wrapper {
+        max-height: 350px;
+        overflow-y: auto;
         overflow-x: auto;
     }
+
+        .top-products-card .products-list-wrapper::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        .top-products-card .products-list-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .top-products-card .products-list-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+            .top-products-card .products-list-wrapper::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
 
 .top-products-table {
     width: 100%;
     border-collapse: collapse;
-    text-align: left;
 }
 
     .top-products-table th {
+        position: sticky;
+        top: 0;
+        background: #f8f9fa;
+        z-index: 1;
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
@@ -605,6 +681,7 @@
         padding: 10px 12px;
         border-bottom: 1px solid #f1f5f9;
         letter-spacing: 0.5px;
+        white-space: nowrap;
     }
 
     .top-products-table td {
@@ -619,7 +696,6 @@
         background-color: #f8fafc;
     }
 
-    /* Məhsul Adı və Sayı */
     .top-products-table .product-name {
         font-weight: 600;
         color: #1e293b;
@@ -637,7 +713,6 @@
         color: #0f172a;
     }
 
-    /* Sıralama Nişanları (Badges) */
     .top-products-table .rank-cell {
         text-align: center;
     }
@@ -672,18 +747,3 @@
         background: #f1f5f9;
         color: #64748b;
     }
-
-
-.dashboard-tables-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-    margin-top: 20px;
-}
-
-@media (max-width: 1100px) {
-    .dashboard-tables-grid {
-        grid-template-columns: 1fr;
-    }
-}

@@ -50,11 +50,12 @@ namespace Data.Concrete
             FROM OrderItems oi
             INNER JOIN Products p ON oi.ProductId = p.Id
             INNER JOIN Orders o ON oi.OrderId = o.Id
-            WHERE o.OrderDate >= @StartDate 
-              AND o.OrderDate <= @EndDate
+            -- DÜZƏLİŞ: Burada da CAST istifadə edərək saatları sıfırlayırıq
+            WHERE CAST(o.OrderDate AS DATE) BETWEEN CAST(@StartDate AS DATE) AND CAST(@EndDate AS DATE)
               AND (@CategoryId IS NULL OR p.CategoryId = @CategoryId)
             GROUP BY p.Id, p.Name
             ORDER BY SalesCount DESC;";
+
             return await _connection.QueryAsync<dynamic>(sql, new { StartDate = startDate, EndDate = endDate, CategoryId = categoryId }, _transaction);
         }
     }

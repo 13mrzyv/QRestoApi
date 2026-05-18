@@ -46,5 +46,22 @@ namespace Business.Concrete
                 ActiveTotal = result.ActiveTotal ?? 0m
             };
         }
+        public async Task<IEnumerable<TopProductResponse>> GetTopSellingProductsAsync(DateTime startDate, DateTime endDate, int? categoryId)
+        {
+            var result = await _unitOfWork.ReportsRepository.GetTopSellingProductsAsync(startDate, endDate, categoryId);
+            // Əgər bazadan heç bir məlumat gəlməyibsə (null dursa), boş siyahı qaytarırıq
+            if (result == null)
+            {
+                return Enumerable.Empty<TopProductResponse>();
+            }
+
+            // LINQ Select ilə hər bir dynamic elementi TopProductResponse-a çeviririk
+            return result.Select(item => new TopProductResponse
+            {
+                ProductName = item.ProductName ?? "N/A",
+                SalesCount = item.SalesCount ?? 0,
+                TotalRevenue = item.TotalRevenue ?? 0m
+            });
+        }
     }
 }

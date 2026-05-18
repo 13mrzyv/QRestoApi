@@ -8,6 +8,7 @@
 @layout QResto.Blazor.Layouts.AdminLayout
 @inject NavigationManager NavManager
 @inject FinanceService financeService
+@inject AdminService adminService
 
 
 
@@ -169,14 +170,23 @@
                 <h3 class="card-title">Məhsul Satış Analizi</h3>
 
                 <div class="category-tabs">
-                    <button class="tab-btn active">Hamısı</button>
-                    <button class="tab-btn">Soyuq İçkilər</button>
-                    <button class="tab-btn">Yeməklər</button>
-                    <button class="tab-btn">Isti İçkilər</button>
-                    <button class="tab-btn">Desertlər</button>
+                    <button class="tab-btn @(selectedCategoryId == null ? "active" : "")"
+                            @onclick="() => SelectCategory(null)">
+                        Hamısı
+                    </button>
+
+                    @if (categories != null)
+                    {
+                        @foreach (var cat in categories)
+                        {
+                            <button class="tab-btn @(selectedCategoryId == cat.Id ? "active" : "")"
+                                    @onclick="() => SelectCategory(cat.Id)">
+                                @cat.Name
+                            </button>
+                        }
+                    }
                 </div>
             </div>
-
             <div class="products-list-wrapper">
                 <table class="top-products-table">
                     <thead>
@@ -188,30 +198,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="rank-cell"><span class="rank-badge gold">1</span></td>
-                            <td class="product-name">Coca-Cola 330ml</td>
-                            <td class="sales-count">42 ədəd</td>
-                            <td class="total-revenue">105.00 AZN</td>
-                        </tr>
-                        <tr>
-                            <td class="rank-cell"><span class="rank-badge silver">2</span></td>
-                            <td class="product-name">Sezar Salatı</td>
-                            <td class="sales-count">28 ədəd</td>
-                            <td class="total-revenue">336.00 AZN</td>
-                        </tr>
-                        <tr>
-                            <td class="rank-cell"><span class="rank-badge bronze">3</span></td>
-                            <td class="product-name">Ayran 200ml</td>
-                            <td class="sales-count">25 ədəd</td>
-                            <td class="total-revenue">37.50 AZN</td>
-                        </tr>
-                        <tr>
-                            <td class="rank-cell"><span class="rank-badge normal">4</span></td>
-                            <td class="product-name">Ispanaq Şorbası</td>
-                            <td class="sales-count">19 ədəd</td>
-                            <td class="total-revenue">114.00 AZN</td>
-                        </tr>
+                        @if (products == null || !products.Any())
+                        {
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 20px; color: #888;">
+                                    Məlumat tapılmadı və ya yüklənir...
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            int index = 1; // Sadə ardıcıl nömrələmə üçün sayğac
+
+                            @foreach (var item in products)
+                            {
+                                <tr>
+                                    <td style="text-align: center; font-weight: 500;">@index</td>
+                                    <td class="product-name">@item.ProductName</td>
+                                    <td class="sales-count" style="text-align: center;">@item.SalesCount ədəd</td>
+                                    <td class="total-revenue" style="text-align: right;">@item.TotalRevenue.ToString("N2") AZN</td>
+                                </tr>
+
+                                index++; // Hər sətirdən sonra nömrəni 1 vahid artırırıq
+                            }
+                        }
                     </tbody>
                 </table>
             </div>
@@ -300,7 +310,7 @@
                                 <th style="width: 40px; text-align: center;">Sil</th>
                                 <th>Açıqlama</th>
                                 <th>Məbləğ</th>
-                                <th>Data</th>
+                                <th>Saat</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -376,7 +386,7 @@
     private OrderDetailResponse orderDetail;
     private bool isOrderModalOpen = false;
     private TotalSalesResponse totalSales;
-    private DateTime startDate = DateTime.Now;
+    private DateTime startDate = DateTime.Today;
     private DateTime endDate = DateTime.Now;
     private HubConnection? hubConnection;
 
@@ -395,6 +405,12 @@
     private bool isExpenseModalOpen = false;
 
     //Finance
+
+    //TopSellingProducts
+    private List<TopProductResponse> products = new();
+    private List<CategoryResponse> categories = new();
+    private int? selectedCategoryId = null; // Default olaraq "Hamısı" (null) seçili qalır
+    //TopSellingProducts
 
 
     private async Task ViewOrderDetails(int orderId)
@@ -438,6 +454,8 @@
     // Bu sənin mövcud məntiqini icra edən mərkəzi metodun olacaq
     private async Task RefreshDashboard()
     {
+        categories = await adminService.GetAllCategoriesAsync();
+        await LoadProductsAsync();
         orders = await orderService.GetOrdersByDateRangeAsync(startDate, endDate);
         totalSales = await orderService.GetTotalSalesAsync(startDate, endDate);
     }
@@ -473,6 +491,34 @@
 
     private record OrderRow(string Table, string OrderId, string Customer, int Total, string Status);
 
+
+
+    //TopSellingProducts
+    //TopSellingProduct
+
+
+    private async Task SelectCategory(int? categoryId)
+    {
+        // 1. Seçilən kateqoriya ID-sini yeniləyirik (HTML-dəki 'active' klassı buna görə dəyişəcək)
+        selectedCategoryId = categoryId;
+
+        // 2. Yeni seçilən kateqoriyaya görə API-dan məhsulları yenidən yükləyirik
+        await LoadProductsAsync();
+    }
+    // Məhsulları servisdən oxuyan metod
+    private async Task LoadProductsAsync()
+    {
+        // Servisə tarixləri və seçilmiş kateqoriya ID-sini ötürürük
+        products = await adminService.GetTopSellingProductsAsync(startDate, endDate, selectedCategoryId);
+    }
+
+
+
+
+
+
+    //TopSellingProduct
+    //TopSellingProduct
     // Finance
     // Finance
     // Finance

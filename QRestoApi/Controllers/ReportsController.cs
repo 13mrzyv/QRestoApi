@@ -26,5 +26,11 @@ namespace QRestoApi.Controllers
             var result = await _reportsService.GetTotalSalesAsync(startDate, endDate);
             return Ok(result);
         }
+        [HttpGet("{startDate}/{endDate}")] // <--- categoryId buradan silindi
+        public async Task<IActionResult> GetTopSellingProducts(DateTime startDate, DateTime endDate, [FromQuery] int? categoryId) // <--- [FromQuery] əlavə edildi
+        {
+            var result = await _reportsService.GetTopSellingProductsAsync(startDate, endDate, categoryId);
+            return Ok(result);
+        }
     }
 }
