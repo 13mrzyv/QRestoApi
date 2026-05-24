@@ -12,5 +12,7 @@ namespace Data.Abstract
         Task<int> AddExpenseAsync(Expense expense);
         Task<IEnumerable<Expense>> GetExpensesOfTodayAsync();
         Task<bool> DeleteExpenseByIdAsync(int id);
+        Task<decimal> GetTotalExpensesAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<Expense>> GetExpensesByDateAsync(DateTime date);
     }
 }

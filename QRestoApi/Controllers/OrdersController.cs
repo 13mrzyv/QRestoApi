@@ -50,7 +50,7 @@ namespace QRestoApi.Controllers
             var order = await _orderService.GetActiveOrderDetailsAsync(tableId);
 
             if (order == null)
-                return NotFound("Sifariş tapılmadı.");
+                return Ok(null);
 
             return Ok(order);
         }

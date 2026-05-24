@@ -127,15 +127,28 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll", policy =>
+//    {
+//        policy.WithOrigins(
+//                "https://localhost:7182",
+//                "http://localhost:7182",
+//                "http://localhost:5177" // Bura React-ın işlədiyi portu əlavə et
+//              )
+//              .AllowAnyMethod()
+//              .AllowAnyHeader()
+//              .AllowCredentials();
+//    });
+//});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        // Burada ulduz (*) yerinə Blazor proyektinin ünvanlarını dəqiq yazırıq
-        policy.WithOrigins("https://localhost:7182", "http://localhost:7182")
+        policy.AllowAnyOrigin() // Bütün ünvanlara icazə verir
               .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // İndi bu düzgün işləyəcək
+              .AllowAnyHeader();
     });
 });
 

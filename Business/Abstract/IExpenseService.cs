@@ -14,5 +14,7 @@ namespace Business.Abstract
         Task<bool> AddExpenseAsync(CreateExpenseRequest expenseRequest);
         Task<IEnumerable<ExpenseResponse>> GetExpensesOfTodayAsync();
         Task<bool> DeleteExpenseByIdAsync(int id);
+        Task<TotalExpensesResponse> GetTotalExpensesAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<ExpenseResponse>> GetExpensesByDateAsync(DateTime date);
     }
 }

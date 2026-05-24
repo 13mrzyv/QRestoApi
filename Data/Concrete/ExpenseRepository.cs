@@ -34,5 +34,27 @@ namespace Data.Concrete
             var affectedRows = await _connection.ExecuteAsync(sql, new { Id = id }, transaction: _transaction);
             return affectedRows > 0;
         }
+        public async Task<decimal> GetTotalExpensesAsync(DateTime startDate, DateTime endDate)
+        {
+            var sql = "SELECT ISNULL(SUM(Amount), 0) FROM Expenses WHERE ExpenseDate >= @StartDate AND ExpenseDate < @EndDate";
+            return await _connection.ExecuteScalarAsync<decimal>(sql,new { startDate = startDate.Date, endDate = endDate.Date.AddDays(1) },transaction: _transaction);
+        }
+        public async Task<IEnumerable<Expense>> GetExpensesByDateAsync(DateTime date)
+        {
+            var sql = @"
+        SELECT 
+            Id,
+            Description,
+            Amount,
+            ExpenseDate
+        FROM Expenses
+        WHERE CAST(ExpenseDate AS DATE) = @Date
+        ORDER BY ExpenseDate DESC";
+
+            return await _connection.QueryAsync<Expense>(
+                sql,
+                new { Date = date.Date },
+                transaction: _transaction);
+        }
     }
 }

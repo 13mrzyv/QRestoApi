@@ -32,5 +32,6 @@ namespace QRestoApi.Controllers
             var result = await _reportsService.GetTopSellingProductsAsync(startDate, endDate, categoryId);
             return Ok(result);
         }
+
     }
 }

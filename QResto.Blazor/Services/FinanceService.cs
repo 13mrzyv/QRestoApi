@@ -55,5 +55,31 @@ namespace QResto.Blazor.Services
                 return false;
             }
         }
+        public async Task<List<ExpenseResponse>> GetExpensesByDateAsync(DateTime date)
+        {
+            try
+            {
+                string formatted = date.Date.ToString("yyyy-MM-dd");
+                var result = await _httpClient.GetFromJsonAsync<List<ExpenseResponse>>(
+                    $"api/Expense/GetExpensesByDate/{formatted}");
+                return result ?? new List<ExpenseResponse>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetExpensesByDate xətası: {ex.Message}");
+                return new List<ExpenseResponse>();
+            }
+        }
+        public async Task<TotalExpensesResponse> GetTotalExpenses(DateTime startDate, DateTime endDate)
+        {
+            // Tarixləri API-nin tələb etdiyi ISO 8601 formatına salırıq
+            string start = startDate.ToString("yyyy-MM-dd");
+            string end = endDate.ToString("yyyy-MM-dd");
+
+            // Endpoint-i çağırırıq
+            var response = await _httpClient.GetFromJsonAsync<TotalExpensesResponse>($"api/Expense/GetTotalExpenses/{start}/{end}");
+
+            return response;// Və ya xəta idarəetməsi əlavə edin
+        }
     }
 }

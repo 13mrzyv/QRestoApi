@@ -39,6 +39,19 @@ namespace QRestoApi.Controllers
                 return BadRequest("Xərc silinərkən bir xəta baş verdi.");
             }
             return Ok("Xərc uğurla silindi.");
+        
+        }
+        [HttpGet("{startDate}/{endDate}")]
+        public async Task<IActionResult> GetTotalExpenses(DateTime startDate,DateTime endDate)
+        {
+            var result = await _expenseService.GetTotalExpensesAsync(startDate, endDate);
+            return Ok(result);
+        }
+        [HttpGet("{date}")]
+        public async Task<IActionResult> GetExpensesByDate(DateTime date)
+        {
+            var expenses = await _expenseService.GetExpensesByDateAsync(date);
+            return Ok(expenses);
         }
     }
 }

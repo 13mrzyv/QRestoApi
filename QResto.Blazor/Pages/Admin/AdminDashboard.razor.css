@@ -8,7 +8,7 @@
    ================================================ */
 
 .dashboard {
-    padding: 28px;
+    padding-top: 50px;
 }
 
 .dashboard-header {
@@ -31,6 +31,7 @@
     flex-direction: column;
     gap: 12px;
     align-items: flex-end;
+    margin-top: -100px;
 }
 
 .date-picker-container {
@@ -121,7 +122,7 @@
     background-color: #6366f1;
     color: white;
     border: none;
-    padding: 0 18px;
+    padding: 0 16px;
     border-radius: 8px;
     font-weight: 600;
     font-size: 13px;
@@ -141,7 +142,8 @@
    ================================================ */
 
 .stats-grid {
-    display: grid;
+    display: flex; /* Yan-yana gətirir */
+    flex-direction: row;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
     margin-bottom: 24px;
@@ -342,35 +344,57 @@
 }
 
     .finance-action-card .card-title {
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 17px;
+        font-weight:700;
         letter-spacing: 0.5px;
         text-transform: uppercase;
         color: #1e293b;
         margin: 0;
     }
 
-    .finance-action-card .add-btn {
+    .finance-action-card .add-btn-today {
         background: #6366f1;
         color: #ffffff;
         border: none;
         border-radius: 6px;
-        padding: 8px 16px;
-        font-size: 12px;
+        padding: 5px 10px;
+        font-size: 10px;
         font-weight: 600;
         cursor: pointer;
         transition: background 0.2s, transform 0.1s;
         white-space: nowrap;
+        margin: 0 5px;
     }
 
-        .finance-action-card .add-btn:hover {
+        .finance-action-card .add-btn-today:hover {
             background: #4f46e5;
         }
 
-        .finance-action-card .add-btn:active {
+        .finance-action-card .add-btn-today:active {
             transform: scale(0.98);
         }
 
+    .finance-action-card .add-btn-all {
+        background: #f59e0b;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        white-space: nowrap;
+        margin: 0 5px;
+    }
+
+        .finance-action-card .add-btn-all:hover {
+            background: #d97706;
+        }
+
+        .finance-action-card .add-btn-all:active {
+            transform: scale(0.98);
+        }
 /* ================================================
    CƏDVƏL GRİD — yan-yana, eyni hündürlük
    ================================================ */
@@ -593,7 +617,7 @@
         flex-wrap: nowrap;
         padding-bottom: 6px;
         flex-shrink: 0;
-        max-width: 450px;
+        max-width: 700px;
     }
 
         .top-products-card .category-tabs::-webkit-scrollbar {
@@ -747,3 +771,135 @@
         background: #f1f5f9;
         color: #64748b;
     }
+
+
+/*small expenses modal css*/
+/*----------------------------*/
+/*----------------------------*/
+/*----------------------------*/
+/*----------------------------*/
+/* AdminDashboard.razor.css-ə əlavə et */
+
+/* ── Bütün xərclər düyməsi ── */
+/*.add-btn-all {
+    height: 36px;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+    .add-btn-all:hover {
+        background-color: #e2e8f0;
+        color: #1e293b;
+    }
+*/
+.add-btn-all {
+    height: auto;
+    min-height: 36px;
+    width: 80px;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
+}
+
+    .add-btn-all:hover {
+        background-color: #e2e8f0;
+        color: #1e293b;
+    }
+
+.add-btn-today {
+    height: 36px;
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+    .add-btn-today:hover {
+        background-color: #4f46e5;
+    }
+
+/* ── All Expenses Modal ── */
+.all-expenses-modal {
+    max-width: 600px !important;
+}
+
+.expense-date-filter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.expense-date-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.expense-date-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.expense-loading {
+    text-align: center;
+    padding: 32px;
+    color: #94a3b8;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.expense-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-top: 8px;
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
+    border-radius: 0 0 8px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.expense-total-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}

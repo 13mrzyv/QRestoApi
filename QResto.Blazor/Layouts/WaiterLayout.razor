@@ -1,12 +1,17 @@
-﻿@inherits LayoutComponentBase
+﻿@using QResto.Blazor.Services
+@inherits LayoutComponentBase
+@inject UserProvider userProvider
+@inject NavigationManager Navigation
 
 <div class="waiter-layout">
-    <header style="background: #333; color: white; padding: 10px;">
-        <h3>QResto - Ofisiant Paneli</h3>
-        <nav>
-            <!-- Gələcəkdə bura menyu düymələri əlavə edəcəksən -->
-            <span>Xoş gəldiniz!</span>
-        </nav>
+    <header style="background: #4f46e5; color: white; padding: 15px 25px; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <button @onclick="SignOut" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s;">
+            ← Çıxış
+        </button>
+        <h3 style="margin: 0; flex-grow: 1; font-weight: 600; letter-spacing: 0.5px;">QResto - Ofisiant Paneli</h3>
+        <span style="font-family: sans-serif; font-weight: 700; font-size: 1em; border: 2px solid white; padding: 6px 15px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px;">
+            👤 @userProvider.Username
+        </span>
     </header>
 
     <main style="padding: 20px;">
@@ -18,5 +23,17 @@
     </footer>
 </div>
 @code {
+    private void SignOut()
+    {
+        if (userProvider.IsAdmin)
+        {
+            Navigation.NavigateTo("/admin/admindashboard");
+        }
+        else
+        {
+            Navigation.NavigateTo("/login");
+        }
+
+    }
 
 }

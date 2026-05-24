@@ -11,9 +11,6 @@
 
 <div class="main-wrapper">
     <div class="content-area">
-        <h3 class="page-title">Zalın Vəziyyəti</h3>
-        <h3 class="page-title">Waiter - @userProvider.Username</h3>
-
         @if (tables == null)
         {
             <div class="loader-container">
@@ -110,6 +107,20 @@
 
         await hubConnection.StartAsync();   
     }
+
+    private void SignOut()
+    {
+        if (userProvider.IsAdmin)
+        {
+            Navigation.NavigateTo("/admin/admindashboard");
+        }
+        else
+        {
+            Navigation.NavigateTo("/login");
+        }
+        
+    }
+
     private void ClearTable(TableResponse table)
     {
         tableToProcess = table;

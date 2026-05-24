@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@* @page "/" *@
 @page "/admin/admindashboard"
 @using Microsoft.AspNetCore.SignalR.Client
 @using QResto.Blazor.Services
@@ -54,28 +54,37 @@
                 </div>
             </div>
             <div class="stats-column">
+                <div class="stat-card">
+                    <div class="stat-icon order-icon">🪑</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Aktiv Masalar</span>
+                        <span class="stat-value">@numberOfActiveOrders</span>
+                    </div>
+                </div>
                 <div class="stat-card" @onclick='() => NavManager.NavigateTo($"/waiter/waiterdashboard/{UserName}")' style="cursor:pointer;">
                     <div class="stat-icon table-icon">🍽</div>
                     <div class="stat-info">
                         <span class="stat-label">Masalar Ve Menyu</span>
                     </div>
                 </div>
-
+            </div>
+            <div class="stats-column">
                 <div class="stat-card">
-                    <div class="stat-icon order-icon">👨‍🍳</div>
+                    <div class="stat-icon order-icon">📉</div>
                     <div class="stat-info">
-                        <span class="stat-label">Aktiv Masalar</span>
-                        <span class="stat-value">@numberOfActiveOrders</span>
-                        @* <span class="stat-sub neutral">Mətbəx</span> *@
+                        <span class="stat-label">Umumi xerc</span>
+                        @* <span class="stat-value">@totalExpenses.TotalExpenses.ToString("N2")</span> *@
+                        <span class="stat-value">@(totalExpenses?.TotalExpenses.ToString("N2") ?? "0.00")</span>
+                    </div>
+                </div>
+                <div class="stat-card" @onclick='() => NavManager.NavigateTo($"/waiter/waiterdashboard/{UserName}")' style="cursor:pointer;">
+                    <div class="stat-icon table-icon">🍽</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Masalar Ve Menyu</span>
                     </div>
                 </div>
             </div>
-
         </div>
-
-
-
-        @* <h2 class="dashboard-title">İdarə Paneli Baxışı</h2> *@
         <div class="filter-wrapper">
             <div class="date-picker-container">
                 <div class="date-input-group">
@@ -95,18 +104,22 @@
                 </div>
 
                 <button class="filter-ok-btn" @onclick="@OnDateChanged">
-                    <i class="fas fa-check"></i> OK
+                    <i class="fas fa-check"></i>OK
                 </button>
             </div>
 
             <div class="finance-action-card">
-                <h4 class="card-title">Gündəlik Maliyyə Hesabatı</h4>
-                <button class="add-btn" @onclick="OpenExpenseModal">
+                <h1 class="card-title">Xərc Hesabatı</h1>
+                <button class="add-btn-today" @onclick="OpenExpenseModal">
                     &#43; Xərc Əlavə Et
+                </button>
+                <button class="add-btn-all" @onclick="OpenAllExpensesModal">
+                     Bütün xərclər
                 </button>
             </div>
         </div>
     </div>
+</div>
 
     <div class="dashboard-tables-grid">
         <!-- Son Sifarişlər Cədvəli -->
@@ -145,7 +158,7 @@
                                 <tr>
                                     <td>@order.TableNumber</td>
                                     <td>#@order.Id</td>
-                                    <td>@order.OrderDate.ToString("HH:mm")</td> @* Saat:Dəqiqə formatı *@
+                                    <td>@order.OrderDate.ToString("dd.MM.yyyy ' / ' HH:mm")</td> @* Saat:Dəqiqə formatı *@
                                     <td>@order.TotalAmount AZN</td>
                                     <td>
                                         @* Statusa görə fərqli CSS class-ları veririk *@
@@ -227,8 +240,6 @@
             </div>
         </div>
     </div>
-
-</div>
 
 @* _____________MODALS______________ *@
 @if (isOrderModalOpen && orderDetail != null)
@@ -367,6 +378,111 @@
     </div>
 }
 
+@* ── 3. Modal HTML-i — mövcud modalların yanına əlavə et ── *@
+@if (isAllExpensesModalOpen)
+{
+    <div class="modal-backdrop" @onclick="CloseAllExpensesModal">
+        <div class="modal-content expanded-modal all-expenses-modal" @onclick:stopPropagation>
+
+            <div class="modal-header">
+                <div>
+                    <h3>Xərc Tarixçəsi</h3>
+                    <p class="modal-subtitle">Tarixə görə xərcləri süzün</p>
+                </div>
+                <button class="close-btn" @onclick="CloseAllExpensesModal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+
+                @* ── Tarix seçici ── *@
+                <div class="expense-date-filter">
+                    <div class="expense-date-label">
+                        <span>📅</span>
+                        <span>Tarix seçin:</span>
+                    </div>
+                    <div class="expense-date-controls">
+                        <div class="date-display-wrapper">
+                            <input type="date"
+                                   @bind="expenseFilterDate"
+                                   @bind:event="onchange"
+                                   class="real-date-input" />
+                            <div class="fake-date-input">@expenseFilterDate.ToString("dd.MM.yyyy")</div>
+                        </div>
+                        <button class="filter-ok-btn" @onclick="LoadExpensesByDate">
+                            <i class="fas fa-search"></i> Axtar
+                        </button>
+                    </div>
+                </div>
+
+                @* ── Xərclər cədvəli ── *@
+                <div class="table-wrapper">
+                    @if (isFilteredExpensesLoading)
+                    {
+                        <div class="expense-loading">
+                            <i class="fas fa-circle-notch fa-spin"></i> Yüklənir...
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="expense-table">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Açıqlama</th>
+                                    <th>Məbləğ</th>
+                                    <th>Saat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (filteredExpenses == null || !filteredExpenses.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" style="text-align:center; color:#94a3b8; padding:24px;">
+                                            @expenseFilterDate.ToString("dd.MM.yyyy") tarixində xərc tapılmadı.
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    int i = 1;
+                                    @foreach (var item in filteredExpenses)
+                                    {
+                                        <tr>
+                                            <td style="text-align:center; color:#94a3b8;">@i</td>
+                                            <td>@item.Description</td>
+                                            <td class="amt">@item.Amount.ToString("N2") AZN</td>
+                                            <td class="time-col">@item.ExpenseDate.ToString("HH:mm")</td>
+                                        </tr>
+                                        i++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+
+                        @* ── Cəm sətri ── *@
+                        @if (filteredExpenses != null && filteredExpenses.Any())
+                        {
+                            <div class="expense-total-row">
+                                <span>Cəmi:</span>
+                                <span class="expense-total-val">
+                                    @filteredExpenses.Sum(e => e.Amount).ToString("N2") AZN
+                                </span>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-view" @onclick="CloseAllExpensesModal">Bağla</button>
+            </div>
+
+        </div>
+    </div>
+}
+
+
 @if (showToast)
 {
     <div class="toast-notification @(toastType == "danger" ? "toast-danger" : "")">
@@ -403,6 +519,12 @@
     private List<ExpenseResponse>? todayExpenses;
 
     private bool isExpenseModalOpen = false;
+    private TotalExpensesResponse totalExpenses;
+
+    private bool isAllExpensesModalOpen = false;
+    private DateTime expenseFilterDate = DateTime.Today;
+    private List<ExpenseResponse>? filteredExpenses;
+    private bool isFilteredExpensesLoading = false;
 
     //Finance
 
@@ -458,6 +580,7 @@
         await LoadProductsAsync();
         orders = await orderService.GetOrdersByDateRangeAsync(startDate, endDate);
         totalSales = await orderService.GetTotalSalesAsync(startDate, endDate);
+        totalExpenses = await financeService.GetTotalExpenses(startDate, endDate);
     }
     private async Task OnDateChanged()
     {
@@ -529,9 +652,10 @@
         // Modal açılanda ən son xərcləri backend-dən çəkirik
         await LoadTodayExpenses();
     }
-    private void CloseExpenseModal()
+    private async Task CloseExpenseModal()
     {
         isExpenseModalOpen = false;
+        await RefreshDashboard();
     }
 
     private async Task HandleAddSuccess()
@@ -632,6 +756,37 @@
 
         await HandleAddSuccess();
     }
+
+    private async Task OpenAllExpensesModal()
+    {
+        isAllExpensesModalOpen = true;
+        await LoadExpensesByDate();
+    }
+
+    private void CloseAllExpensesModal()
+    {
+        isAllExpensesModalOpen = false;
+        filteredExpenses = null;
+    }
+
+    private async Task LoadExpensesByDate()
+    {
+        isFilteredExpensesLoading = true;
+        try
+        {
+            filteredExpenses = await financeService.GetExpensesByDateAsync(expenseFilterDate);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Xərc yüklənərkən xəta: {ex.Message}");
+            filteredExpenses = new();
+        }
+        finally
+        {
+            isFilteredExpensesLoading = false;
+        }
+    }
+
     // Finance
     // Finance
     // Finance

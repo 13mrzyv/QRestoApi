@@ -288,6 +288,7 @@
     private void GoToDashboard()
     {
         BasketService.Items.Clear();
-        NavigationManager.NavigateTo($"/waiter/waiterdashboard/{userProvider.Username}");
+        NavigationManager.NavigateTo($"/waiter/waiterdashboard");
     }
+
 }

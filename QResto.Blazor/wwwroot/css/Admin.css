@@ -40,7 +40,7 @@
     /* ================================================
    SİDEBAR
    ================================================ */
-
+/*
     .admin-wrapper .sidebar {
         width: var(--sidebar-width);
         background: var(--sidebar-bg);
@@ -111,7 +111,7 @@
         font-size: 16px;
         width: 20px;
         text-align: center;
-        flex-shrink: 0;
+        flex-shrink: 0;*/
     }
 
     .admin-wrapper .sidebar-footer {
@@ -120,30 +120,34 @@
     }
 
     .admin-wrapper .signout-btn {
-        width: 100%;
-        padding: 11px;
+        /* Padding-i kiçildirik (məsələn: yuxarı-aşağı 4px, sağ-sol 10px) */
+        padding: 4px 10px;
+        /* Düymənin avtomatik genişlənməsinin qarşısını alırıq */
+        width: fit-content;
         background: transparent;
-        border: 1.5px solid rgba(255, 255, 255, 0.15);
-        border-radius: 8px;
-        color: var(--text-muted);
+        border: 1.5px solid #ff4d4d;
+        border-radius: 6px; /* Kənarları bir az daha kəskin edə bilərsiniz */
+        color: #ff4d4d;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.18s ease;
+        /* Flex-i ləğv edirik və ya sadələşdiririk */
+        display: inline-block;
     }
 
         .admin-wrapper .signout-btn:hover {
-            background: rgba(255, 255, 255, 0.07);
-            color: var(--text-light);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: #ff4d4d;
+            color: #ffffff;
+            /* Hover zamanı bir az da böyümə effekti (istəsəniz) */
+            transform: scale(1.02);
+            box-shadow: 0 4px 10px rgba(255, 77, 77, 0.2);
         }
-
     /* ================================================
    TOPBAR
    ================================================ */
 
     .admin-wrapper .main-content {
-        margin-left: var(--sidebar-width);
+       
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -156,16 +160,23 @@
         display: flex;
         align-items: center;
         gap: 20px;
-        padding: 0 28px;
         height: 64px;
-        position: sticky;
-        top: 0;
-        z-index: 50;
         box-shadow: var(--shadow);
+        position: fixed; /* və ya sticky */
+        top: 0;
+        left: 0;
+        width: 100vw; /* Ekranın 100% genişliyi */
+        margin: 0;
+        padding: 0 28px; 
+        box-sizing: border-box;
+        z-index: 1000;
     }
-
+    .admin-wrapper .sidebar-footer {
+        padding: 0 20px;
+        margin-top: auto;
+    }
     .admin-wrapper .page-title {
-        font-size: 16px;
+        font-size: 20px;
         font-weight: 700;
         letter-spacing: 0.05em;
         color: #111;
