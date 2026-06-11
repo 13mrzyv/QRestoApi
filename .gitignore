@@ -4,3 +4,4 @@
 .vscode/
 *.user
 appsettings.Development.json
+.env

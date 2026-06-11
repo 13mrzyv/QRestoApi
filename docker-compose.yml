@@ -1,30 +1,33 @@
 ﻿version: '3.8'
+
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: qresto-db
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=QResto@2026!
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
       - TZ=Asia/Baku
     ports:
       - "1433:1433"
     volumes:
       - qresto_data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'QResto@2026!' -Q 'SELECT 1' -No"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${DB_PASSWORD}' -Q 'SELECT 1' -No"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
 
   api:
-    image: qrestoapi:latest
+    build:
+      context: .
+      dockerfile: QRestoApi/Dockerfile
     container_name: QRestoApi
     restart: always
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=QRestoDb;User Id=sa;Password=QResto@2026!;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=db;Database=QRestoDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
       - TZ=Asia/Baku
     ports:
       - "5000:8080"
@@ -33,8 +36,11 @@ services:
         condition: service_healthy
 
   blazor:
-    image: qresto-blazor:latest
+    build:
+      context: .
+      dockerfile: QResto.Blazor/Dockerfile
     container_name: qresto-blazor-cont
+    restart: always
     ports:
       - "3000:80"
 
