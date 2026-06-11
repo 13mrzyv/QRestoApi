@@ -95,7 +95,7 @@
         await LoadTables();
 
         hubConnection = new HubConnectionBuilder()
-        .WithUrl("https://localhost:7001/orderHub") // API portun
+        .WithUrl("http://localhost:5000/orderHub") // API portun
         .WithAutomaticReconnect()
         .Build();
 

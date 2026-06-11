@@ -1,0 +1,42 @@
+﻿version: '3.8'
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: qresto-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=QResto@2026!
+      - TZ=Asia/Baku
+    ports:
+      - "1433:1433"
+    volumes:
+      - qresto_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'QResto@2026!' -Q 'SELECT 1' -No"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    image: qrestoapi:latest
+    container_name: QRestoApi
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=QRestoDb;User Id=sa;Password=QResto@2026!;TrustServerCertificate=True;
+      - TZ=Asia/Baku
+    ports:
+      - "5000:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  blazor:
+    image: qresto-blazor:latest
+    container_name: qresto-blazor-cont
+    ports:
+      - "3000:80"
+
+volumes:
+  qresto_data:

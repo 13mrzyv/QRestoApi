@@ -17,6 +17,6 @@ builder.Services.AddScoped<UserProvider>();
 builder.Services.AddScoped<FinanceService>();
 
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7001/") });
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5000/") });
 
 await builder.Build().RunAsync();

@@ -244,7 +244,7 @@
     {
         // 1. Bağlantını qururuq
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7001/orderHub")
+            .WithUrl("http://localhost:5000/orderHub")
             .Build();
 
         // 2. Dinləyicini (Listener) aktiv edirik
